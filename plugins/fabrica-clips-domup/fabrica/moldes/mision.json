@@ -1,0 +1,18 @@
+{
+ "id": "mision",
+ "nombre": "🕵️ Misión",
+ "estado": "aprobado",
+ "origen": "Clip de la funda cubre asiento de MTL (MLA<item>, 04-Oct-2026), aprobado por Diego: FlowExports/MLA<item>-clip/REEL-mtl-funda-mision-v1.mp4 · plantilla shorts-mtl/scripts/5d-build-index-mision.mjs",
+ "sirve_para": "productos que resuelven un problema concreto y visible, con un antes y un después claros: protección, limpieza, orden, organización, mascotas, auto, hogar. No sirve para moda o belleza.",
+ "estructura": [
+  {"beat": "alerta", "que": "el problema aparece de golpe, como una emergencia (ALERTA: <problema>)", "fx": ["cartel_alerta"]},
+  {"beat": "presentacion", "que": "los personajes se presentan como en una película de espías (cargo + nombre)", "fx": ["cartel_personaje", "foco"]},
+  {"beat": "mision", "que": "arranca el reloj: hay que resolverlo ya", "fx": ["timer"]},
+  {"beat": "despliegue", "que": "el producto entra en acción y se tilda cada cosa que cubre o resuelve", "fx": ["checks", "foco"]},
+  {"beat": "prueba", "que": "la prueba de fuego: el problema vuelve y el producto aguanta («¡No pasa ni una!»)", "fx": ["timer"]},
+  {"beat": "cumplida", "que": "el remate con el resultado y el sello", "fx": ["sello_mision_cumplida"]},
+  {"beat": "cierre", "que": "cierre de la marca con 3 checks del producto y el llamado", "fx": ["cierre_checks"]}
+ ],
+ "tono": "aventura, urgencia con humor, voz de narrador de película o diálogo corto entre los agentes",
+ "fx_disponibles": ["cartel_alerta", "cartel_personaje", "foco", "timer", "checks", "contador", "paso", "reloj", "circulos", "sello_mision_cumplida", "cierre_checks", "barra_progreso", "grano_y_vineta"]
+}

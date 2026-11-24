@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "domup": {
+      "type": "http",
+      "url": "https://mcp.domup.app/api/mcp"
+    },
+    "elevenlabs": {
+      "type": "http",
+      "url": "https://api.elevenlabs.io/v1/mcp"
+    },
+    "google-flow": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/vendor/google-flow-mcp/dist/index.js"
+      ]
+    }
+  }
+}

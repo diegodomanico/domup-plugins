@@ -1,0 +1,17 @@
+{
+ "id": "confesionario",
+ "nombre": "🎥 Confesionario (reality)",
+ "estado": "aprobado",
+ "origen": "Mini serie de Veoquiero, episodios aprobados ep03-ep17 (Oct-2026): un integrante confiesa en la cabina roja tipo reality y el resto es la historia en la casa.",
+ "sirve_para": "productos de uso cotidiano o divertidos donde hay una anécdota que contar: juguetes, disfraces, hogar, tecnología chica, regalos. Cualquier marca con elenco puede usarlo.",
+ "estructura": [
+  {"beat": "confiesa_problema", "que": "escena 1 en el CONFESIONARIO: un personaje confiesa el problema con humor a cámara", "fx": ["cartel_personaje"]},
+  {"beat": "historia", "que": "escenas 2 a 4 en la casa: lo que pasó, con un giro (algo sale mal)", "fx": ["subtitulos", "chips"]},
+  {"beat": "resuelve", "que": "escena 5: el producto lo resuelve", "fx": ["chips"]},
+  {"beat": "confiesa_remate", "que": "escena 6 de vuelta en el CONFESIONARIO: el remate con gracia", "fx": ["cartel_personaje"]},
+  {"beat": "cierre", "que": "cierre de la marca", "fx": ["cierre_marca"]}
+ ],
+ "tono": "reality show, cómplice, con humor; narración en off de un personaje fijo si la marca lo tiene",
+ "requiere": "retrato de confesionario del personaje que confiesa (se genera una vez por marca: cabina roja con el personaje sentado)",
+ "fx_disponibles": ["cartel_personaje", "subtitulos", "chips", "cierre_marca"]
+}
