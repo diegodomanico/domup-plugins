@@ -23,7 +23,7 @@ La voz y los subtítulos de Flow **no se usan en el clip** (salen mal): la voz r
 
 ## 2 · Generar
 
-En el mismo proyecto de Flow del storyboard: video desde el cuadro aprobado como primer cuadro, **4 s**, 9:16, el modelo más barato que dé calidad (Veo Lite ronda 10 créditos por tramo; leé el costo en pantalla antes de cada uno). Una variante por escena; se regenera solo la que el revisor marque. Bajá a `anim/e1.mp4 … e6.mp4`.
+En el mismo proyecto de Flow del storyboard: video desde el cuadro aprobado como primer cuadro, **4 s**, 9:16, con `family="omni"` y `resolution` según `clip-<item>/config.json` (720p con plan pago de Google, 360p sin plan; si falta, preguntá «¿Tenés un plan pago de Google?»). Omni 720p de 4 s cuesta 7 créditos por tramo (medido); leé el costo en pantalla antes de cada uno. Una variante por escena; se regenera solo la que el revisor marque. Bajá a `anim/e1.mp4 … e6.mp4`.
 
 ## 3 · La puerta
 

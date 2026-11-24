@@ -26,6 +26,11 @@ Al arrancar, si `flow_status` responde (confirme la sesión o falle) —o si con
 
 Flow se usa con la cuenta de Google del vendedor (por el conector local o en su Chrome), para gastar los créditos de su plan (50 gratis por día; Google AI Pro suma 1.000 por mes). Nunca generes imágenes ni video por otra vía paga sin que el vendedor lo pida.
 
+**Antes de arrancar, una sola pregunta (Diego, 24-Nov): «¿Tenés un plan pago de Google (Google AI Pro o Ultra)?»**
+- **Sí** → los videos se animan en **720p**.
+- **No** → se animan en **360p**, para que los 50 créditos gratis del día alcancen para terminar un clip en el mismo día (en 720p no llegan).
+Anotá la respuesta en `clip-<item>/config.json` (`"resolucion": "720p"` o `"360p"`) y no la vuelvas a preguntar en ese clip. Las imágenes del storyboard no cambian.
+
 ## Paso 1 · La receta
 
 Llamá `clip_receta(item_id, cust_id)`. Es la fuente de verdad: trae los 6 bloques de la receta vigente (guion, candado de producto, storyboard, prompts de Flow, montaje y controles), el producto con sus fotos reales y atributos verificados, la marca de terceros que no se puede usar, el elenco con retratos, semillas y `voz_id`, las 2 locaciones con sus 3 placas y su `lock_en`, el vestuario y el logo. Si la receta avisa que el setup no está completo, frená y guiá a completarlo antes de seguir.
