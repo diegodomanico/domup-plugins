@@ -1,0 +1,13 @@
+{
+  "name": "domup",
+  "owner": { "name": "Domup Digital S.A.", "email": "hola@domup.com.ar" },
+  "metadata": { "description": "Plugins de DomUP para vender más en MercadoLibre con Claude" },
+  "plugins": [
+    {
+      "name": "fabrica-clips-domup",
+      "source": "./plugins/fabrica-clips-domup",
+      "description": "La fábrica de clips de DomUP: guion viral, elenco, storyboard y animación en Google Flow, voces de ElevenLabs y montaje.",
+      "version": "1.0.0"
+    }
+  ]
+}
