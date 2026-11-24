@@ -23,8 +23,11 @@ Consignas originales, a seguir enteras: `references/storyboard-plan.md` (el plan
 2. Subí con nombres **únicos** (prefijo `<item>-`): las 3 fotos de ángulos, las vistas de la hoja de cada personaje y las placas usadas (`set-<id>-a.png`…). Flow elige referencias por nombre.
 3. Modo manual, nunca el agente de Flow. Modelo de imagen de mayor calidad disponible, formato **9:16**, 2 variantes por cuadro.
 4. **Con locaciones**: cada cuadro directo en alta con su placa + 3 fotos del producto + hoja del personaje + el prompt del plan. **Sin locaciones**: primero un lienzo 3x2 con los 6 cuadros y el bloque PRODUCTO + SCALE LOCK; después cada cuadro en alta usando el lienzo como referencia.
-5. Elegí la mejor variante de cada cuadro con los criterios de `references/storyboard.md` (mismo producto y escala que las fotos, misma persona que la hoja, placa respetada en lado de cámara y muebles, sin texto, contacto mano-producto creíble). Bajá los 8 a `paneles/c1.png … c8.png`.
+5. Elegí la mejor variante de cada cuadro con los criterios de `references/storyboard.md` (mismo producto y escala que las fotos, misma persona que la hoja, placa respetada en lado de cámara y muebles, sin texto, contacto mano-producto creíble). Bajá los 6 a `paneles/c1.png … c6.png`.
+6. Armá siempre `storyboard.jpg` sin que te lo pidan: fila de arriba con las 3 fotos del producto rotuladas «PRODUCTO · FRENTE / LADO / DETALLE» (o «GENERADA») y abajo los 6 cuadros en 2 filas de 3, numerados, con la frase de cada escena debajo (ffmpeg o Python con Pillow). Es lo que ve el vendedor en su parada.
 
 ## 3 · La puerta
 
-`clip_revisar(item_id, paso="storyboard", imagenes=[los 6])`. Con NO APTO, regenerá solo los cuadros marcados (cambiando su prompt en el plan) y volvé a revisar una vez. Mostrale al vendedor los 6 cuadros en una grilla con la frase de cada escena: es su segunda decisión. Recién con su OK se anima.
+Si los cuadros están en archivos (Descargas o la carpeta de trabajo): achicalos a 1080 px de lado largo con ffmpeg, pedí `clip_revisar_subir(cantidad=N)`, subí cada uno con el `curl --fail-with-body` que devuelve y pasá los path a `clip_revisar`. Sin terminal (claude.ai en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat.
+
+`clip_revisar(item_id, paso="storyboard", imagenes=[los 6])`. Con NO APTO, regenerá solo los cuadros marcados (cambiando su prompt en el plan) y volvé a revisar una vez. Mostrale `storyboard.jpg` al vendedor con la frase de cada escena debajo: es su segunda decisión. Recién con su OK se anima.

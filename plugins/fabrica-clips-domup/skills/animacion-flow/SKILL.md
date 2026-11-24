@@ -23,8 +23,8 @@ La voz y los subtítulos de Flow **no se usan en el clip** (salen mal): la voz r
 
 ## 2 · Generar
 
-En el mismo proyecto de Flow del storyboard: video desde el cuadro aprobado como primer cuadro, **4 s**, 9:16, el modelo más barato que dé calidad (Veo Lite ronda 10 créditos por tramo; leé el costo en pantalla antes de cada uno). Una variante por escena; se regenera solo la que el revisor marque. Bajá a `anim/e1.mp4 … e8.mp4`.
+En el mismo proyecto de Flow del storyboard: video desde el cuadro aprobado como primer cuadro, **4 s**, 9:16, el modelo más barato que dé calidad (Veo Lite ronda 10 créditos por tramo; leé el costo en pantalla antes de cada uno). Una variante por escena; se regenera solo la que el revisor marque. Bajá a `anim/e1.mp4 … e6.mp4`.
 
 ## 3 · La puerta
 
-Extraé 3 fotogramas por tramo (inicio, medio, fin) con ffmpeg y corré `clip_revisar(item_id, paso="escenas", imagenes=[…])` en tandas de hasta 12. Rechazos típicos: el producto cambia de forma o tamaño, aparece texto, una mano de más, cámara que se mueve, labios que no acompañan. Regenerá lo marcado una sola vez y decí el total de créditos gastados.
+Extraé 3 fotogramas por tramo (inicio, medio, fin) con ffmpeg (en tandas de hasta 12: `clip_revisar_subir(cantidad=N)` con `N <= 12`). Si los cuadros están en archivos (Descargas o la carpeta de trabajo): achicalos a 1080 px de lado largo con ffmpeg, pedí `clip_revisar_subir(cantidad=N)` (hasta 12 por tanda), subí cada uno con el `curl --fail-with-body` que devuelve y pasá los path a `clip_revisar(item_id, paso="escenas", imagenes=[…])`. Sin terminal (claude.ai en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat. Rechazos típicos: el producto cambia de forma o tamaño, aparece texto, una mano de más, cámara que se mueve, labios que no acompañan. Regenerá lo marcado una sola vez y decí el total de créditos gastados.

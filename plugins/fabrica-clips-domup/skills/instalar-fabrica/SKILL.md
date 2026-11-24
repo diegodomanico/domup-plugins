@@ -16,6 +16,7 @@ Verificá cada pieza y, si falta, instalala (pedí OK antes de instalar). Mostr�
 | Librerías | `python -c "import cv2, PIL, numpy"` | `python -m pip install opencv-python pillow numpy` |
 | Node 20+ | `node --version` | Windows: `winget install OpenJS.NodeJS.LTS` · Mac: `brew install node` |
 | HyperFrames (efectos del montaje) | `npx hyperframes --version` | se baja solo con `npx` la primera vez |
+| curl (subir cuadros al revisor) | `curl --version` (en PowerShell: `curl.exe --version`) | viene con Windows 10/11 y macOS |
 | Conector google-flow | aparecen las herramientas `flow_*` | `cd ${CLAUDE_PLUGIN_ROOT}/vendor/google-flow-mcp && npm install`, reiniciar Claude |
 | Sesión de Google en Flow | `flow_status` dice que hay sesión | abrir Flow con la herramienta del conector y entrar con la cuenta de Google del plan (Pro: 1.000 créditos por mes) |
 | Clave de ElevenLabs | variable `ELEVENLABS_API_KEY` | se pega una sola vez en el archivo `.env.local` de la carpeta de trabajo; nunca en el chat |

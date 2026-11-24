@@ -13,7 +13,7 @@ El montaje es `${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py`, el mismo que co
 |---|---|
 | `pedido.json` | `clip_receta` (lo armó `fabrica-clip`) |
 | `plan.json`, `paneles/manifest.json` | `storyboard-flow` |
-| `anim-plan.json`, `anim/e1.mp4 … e8.mp4` | `animacion-flow` |
+| `anim-plan.json`, `anim/e1.mp4 … e6.mp4` | `animacion-flow` |
 | `voz/manifest.json` y las tomas | `voces-elevenlabs` |
 | identidad de la marca (`MARCA_JSON`) | `node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/marca-auto.mjs` con el logo y la esencia de `clip_kit_montaje`: logo, color con contraste 4,5:1, música de ElevenLabs y «TIENDA OFICIAL <MARCA>» |
 
@@ -26,5 +26,7 @@ Lo que el script garantiza (y hay que comprobar al final): carátula 0,6 s; todo
 **Sin sesión local**: el mismo script corre en la ejecución de código de Claude (subí la carpeta del clip). Si ahí no hay HyperFrames, avisá que salen sin los carteles animados y seguí con lo demás igual.
 
 ## Puerta
+
+Si los cuadros están en archivos (Descargas o la carpeta de trabajo): achicalos a 1080 px de lado largo con ffmpeg, pedí `clip_revisar_subir(cantidad=N)`, subí cada uno con el `curl --fail-with-body` que devuelve y pasá los path a `clip_revisar`. Sin terminal (claude.ai en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat.
 
 `clip_revisar(item_id, paso="final", imagenes=[carátula + 1 fotograma por escena + cierre])` y la consigna `references/revisor-final.md`. Con NO APTO se corrige y se revisa una vez más.
