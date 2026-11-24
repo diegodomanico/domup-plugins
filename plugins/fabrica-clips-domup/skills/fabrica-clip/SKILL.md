@@ -7,6 +7,8 @@ description: Arma un clip de MercadoLibre de punta a punta con el método de la 
 
 Replicá la fábrica de DomUP tal cual corre en producción. Nada se simplifica: 6 escenas de 2 a 3 s (clip de 12 a 18 s sin carátula ni cierre), 3 fotos del producto, hoja de personaje, placas de locación, revisores en cada paso y montaje con carátula, logo a mitad del clip y cierre de marca. La única diferencia con la fábrica es que acá todo corre en la cuenta del vendedor y Flow se maneja desde su Chrome.
 
+⛔ **ElevenLabs, solo voces** (Diego, 24-Nov). El conector `elevenlabs` también puede generar imágenes y video, pero en la fábrica se usa SOLO para las voces: las imágenes y los videos salen de Google Flow. Si el vendedor pide imágenes o video con ElevenLabs, primero aclarale que eso gasta SUS créditos de ElevenLabs (los mismos de las voces) y esperá su sí explícito antes de generar nada.
+
 ## Paso 0 · Chequeo de la cocina (antes de gastar una moneda)
 
 Verificá y decí en una tabla qué está y qué falta, con el arreglo de cada uno:
@@ -35,7 +37,7 @@ Guardá todo en una carpeta de trabajo de la sesión (`clip-<item>/`) con un `pe
 | 1 | `guion-viral` | 3 guiones de 6 escenas desde virales + preguntas + reseñas; el vendedor elige uno | revisor de sentido |
 | 2 | `perfil-completo-avatar` | hoja de personaje de 8 vistas de cada personaje del guion que no la tenga | la hoja cumple los 5 criterios |
 | 3 | `storyboard-flow` | 6 cuadros 9:16 en Flow con placas, 3 fotos del producto y hojas | `clip_revisar(paso="storyboard")` |
-| 4 | `animacion-flow` | 8 tramos animados de 4 s en Flow | `clip_revisar(paso="escenas")` |
+| 4 | `animacion-flow` | 6 tramos animados de 4 s en Flow | `clip_revisar(paso="escenas")` |
 | 5 | `voces-elevenlabs` | las frases de cada personaje con su `voz_id` y el cierre | duración por escena ≤ 3,5 s |
 | 6 | `montaje-clip` | el MP4 final con carátula, subtítulos, logo, cierre y audio a -14 LUFS | `clip_revisar(paso="final")` |
 | 7 | `galeria-desde-clip` | fotos 2 a 12 y la portada B para el Laboratorio | revisor de fotos |
