@@ -21,6 +21,8 @@ Verificá cada pieza y, si falta, instalala (pedí OK antes de instalar). Mostr�
 | Clave de ElevenLabs | variable `ELEVENLABS_API_KEY` | se pega una sola vez en el archivo `.env.local` de la carpeta de trabajo; nunca en el chat |
 | Carpeta de trabajo | existe `clips/` en la carpeta conectada | crearla |
 
+Cuando `flow_status` confirme la sesión de Google en Flow (o falle), llamá `flow_estado_reportar(conectado, plugin_version, cust_id?)` con el `version` de `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (si tenés varias cuentas, usá `cuentas` para obtener el `cust_id`; con una sola cuenta es opcional). No mandes nada más: ni la cuenta de Google ni datos de la sesión.
+
 Variables que el montaje lee (escribilas en `.env.local` de la carpeta de trabajo): `CLIPS_RAIZ=<carpeta de trabajo>/clips`, `CLIPS_ENV_LOCAL=<carpeta de trabajo>/.env.local`, `SHORTS_MTL=${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl`, `CLIPS_SKILL_SCRIPTS=${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts`.
 
 Sin sesión local (solo claude.ai en el navegador), la fábrica igual corre con Claude en Chrome sobre Flow y el montaje se hace en la ejecución de código de Claude; decíselo al vendedor y seguí.

@@ -22,6 +22,8 @@ Verificá y decí en una tabla qué está y qué falta, con el arreglo de cada u
 | Ejecución de código | Correr un `ffmpeg -version` | Ajustes → Capacidades → Ejecución de código |
 | Setup de la marca | `clip_receta` no devuelve «falta» | Completar esencia, elenco de 10, 6 voces y 2 locaciones (ver abajo) |
 
+Al arrancar, si `flow_status` responde (confirme la sesión o falle) —o si confirmás Flow abierto en Chrome en el modo sin sesión local—, llamá `flow_estado_reportar(conectado, plugin_version, cust_id?)` con el `version` de `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` (si tenés varias cuentas, usá `cuentas` para obtener el `cust_id`; con una sola cuenta es opcional). No mandes nada más: ni la cuenta de Google ni datos de la sesión.
+
 Flow se usa con la cuenta de Google del vendedor (por el conector local o en su Chrome), para gastar los créditos de su plan (50 gratis por día; Google AI Pro suma 1.000 por mes). Nunca generes imágenes ni video por otra vía paga sin que el vendedor lo pida.
 
 ## Paso 1 · La receta
