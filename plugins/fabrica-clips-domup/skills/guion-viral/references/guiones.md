@@ -25,8 +25,10 @@ TAREA
    pregunta, desafío, antes/después, reacción, ASMR…>", "beats": ["<paso 1 en abstracto>", …], "recurso": "<lo que lo hace
    pegar: humor, tensión, sorpresa, satisfacción, identificación>", "sirve_para": "<qué otros tipos de producto podrían usarlo>"}.
 2. Escribí 3 guiones distintos, cada uno inspirado en un viral distinto de virales.json. Reglas de la casa (shorts-mtl):
-   - EXACTAMENTE 8 escenas de ~3 s (el storyboard de la casa son 8 cuadros desde el 30-Oct: más cambios de escena y de lugar). Escena 1 = el problema, creíble y cotidiano.
-   - Locución: máximo ~8 palabras por escena; solo lo que se puede verificar en el título y la ficha.
+   - EXACTAMENTE 6 escenas de 2 a 3 s (Diego, 24-Nov: «LA FÁBRICA DEBERÍA SER 6»; del 30-Oct al 24-Nov fueron 8). El clip
+     dura de 12 a 18 s sin contar la carátula ni el cierre de la marca: más corto retiene más. Escena 1 = el problema, creíble
+     y cotidiano; escena 6 = el remate.
+   - Locución: de 5 a 7 palabras por escena (es lo que entra en 2-3 s); solo lo que se puede verificar en el título y la ficha.
    - Personajes SOLO del elenco del pedido (por su slot). Los animales y los CHICOS no hablan (ElevenLabs no tiene voces de
      chicos): reaccionan con gestos, risas o un grito sin palabras, y lo que haga falta decir lo dice un adulto.
      Las mascotas SÍ hacen su sonido real y se busca (Diego, 29-Oct: «que las mascotas sean lo más reales posibles»): el perro

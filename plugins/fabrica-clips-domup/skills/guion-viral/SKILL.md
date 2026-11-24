@@ -1,6 +1,6 @@
 ---
 name: guion-viral
-description: Escribe 3 guiones de 8 escenas para el clip de una publicación de MercadoLibre con el método de la fábrica DomUP, a partir de un relevamiento de videos virales (YouTube, TikTok y la biblioteca de anuncios de Meta) más las preguntas y las reseñas reales de esa publicación. Usar cuando pidan «armá el guion del clip», «buscá virales para mi producto» o como paso 1 de fabrica-clip.
+description: Escribe 3 guiones de 6 escenas para el clip de una publicación de MercadoLibre con el método de la fábrica DomUP, a partir de un relevamiento de videos virales (YouTube, TikTok y la biblioteca de anuncios de Meta) más las preguntas y las reseñas reales de esa publicación. Usar cuando pidan «armá el guion del clip», «buscá virales para mi producto» o como paso 1 de fabrica-clip.
 ---
 
 # Guion desde virales + preguntas + reseñas
@@ -27,10 +27,10 @@ Leé las páginas con `get_page_text` o `read_page`. Anotá en `virales-crudo.js
 
 ## 3 · Los 3 guiones
 
-Seguí `references/guiones.md` al pie de la letra: 6 a 12 virales elegidos con su **molde** (gancho, beats, recurso, sirve_para), 3 guiones de **exactamente 8 escenas** de 3 a 4 s, cada uno sobre un molde distinto (biblioteca de la casa en `${CLAUDE_PLUGIN_ROOT}/fabrica/moldes/` o el molde de un viral), triple gancho, lo que se nombra se ve, al menos 2 lugares, texto actuado, una misión por video, variedad de elenco y las prohibiciones. Uno solo va como recomendado, con su porqué en una línea.
+Seguí `references/guiones.md` al pie de la letra: 6 a 12 virales elegidos con su **molde** (gancho, beats, recurso, sirve_para), 3 guiones de **exactamente 6 escenas** de 2 a 3 s, de 5 a 7 palabras cada una, cada uno sobre un molde distinto (biblioteca de la casa en `${CLAUDE_PLUGIN_ROOT}/fabrica/moldes/` o el molde de un viral), triple gancho, lo que se nombra se ve, al menos 2 lugares, texto actuado, una misión por video, variedad de elenco y las prohibiciones. Uno solo va como recomendado, con su porqué en una línea.
 
 ## 4 · La puerta
 
-Pasá los 3 por `references/revisor-sentido.md` y reescribí lo que marque antes de mostrarlos. Mostralos como 3 fichas cortas (título, gancho visual/verbal/texto, las 8 escenas en una línea cada una, personajes, molde y el viral que lo inspira con su métrica). El vendedor elige uno: es su primera de 3 decisiones.
+Pasá los 3 por `references/revisor-sentido.md` y reescribí lo que marque antes de mostrarlos. Mostralos como 3 fichas cortas (título, gancho visual/verbal/texto, las 6 escenas en una línea cada una, personajes, molde y el viral que lo inspira con su métrica). El vendedor elige uno: es su primera de 3 decisiones.
 
 Guardá `virales.json`, `voz-comprador.md` y `guiones.json` en la carpeta del clip.

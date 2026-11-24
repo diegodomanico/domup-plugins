@@ -1,9 +1,9 @@
 ---
 name: animacion-flow
-description: Anima en Google Flow (con Claude en Chrome) los 8 cuadros aprobados del storyboard de un clip de MercadoLibre, con los bloques fijos de prompt de la fábrica DomUP (primer cuadro, cámara fija, boca y audio controlados), y pasa los tramos por el revisor. Usar cuando pidan «animá el storyboard», «hacé el video en Flow» o como paso 4 de fabrica-clip.
+description: Anima en Google Flow (con Claude en Chrome) los 6 cuadros aprobados del storyboard de un clip de MercadoLibre, con los bloques fijos de prompt de la fábrica DomUP (primer cuadro, cámara fija, boca y audio controlados), y pasa los tramos por el revisor. Usar cuando pidan «animá el storyboard», «hacé el video en Flow» o como paso 4 de fabrica-clip.
 ---
 
-# Animación en Flow (8 tramos de 4 s)
+# Animación en Flow (6 tramos de 4 s)
 > **Cómo se maneja Flow.** Con el conector `google-flow` del plugin (sesión local), igual que la fábrica: `flow_create_project`, subir con nombre único, `flow_generate_image` / `flow_generate_video`, `flow_download_media`. Sin sesión local, lo mismo a mano en `labs.google/flow` con Claude en Chrome.
 
 

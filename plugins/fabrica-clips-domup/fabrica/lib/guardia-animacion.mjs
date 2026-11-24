@@ -191,7 +191,10 @@ export function guardiaAnimacion(dir) {
     // 30-Oct (Diego: «muy poquitas las animaciones, necesito gráficas»): 2 o 3 por escena y al menos 8 tipos distintos en el clip.
     for (let n = 1; n <= nEsc; n++) { const k = ef.filter((f) => f.escena === n).length; if (k < 2 || k > 3) malos.push(`escena ${n}: ${k} efectos; van 2 o 3 por escena`); }
     const distintos = new Set(ef.map((f) => f.tipo)).size;
-    if (nEsc >= 8 && distintos < 8) malos.push(`solo ${distintos} tipos de efecto distintos; al menos 8 (que no se repita la misma gráfica)`);
+    const minTipos = nEsc >= 8 ? 8 : 6;
+    if (nEsc >= 6 && distintos < minTipos) malos.push(`solo ${distintos} tipos de efecto distintos; al menos ${minTipos} (que no se repita la misma gráfica)`);
+    // 6 escenas (Diego, 24-Nov): el clip va de 12 a 18 s sin carátula ni cierre → hasta 190 letras de voz en total.
+    if (nEsc === 6) { const tot = (a.escenas || []).flatMap((e) => e.frases || []).reduce((s, f) => s + (f.texto || '').replace(/[^\p{L}\d]/gu, '').length, 0); if (tot > 190) malos.push(`${tot} letras de voz en total; con 6 escenas hasta 190 (el clip pasaría de 18 s)`); }
     const cuenta = {};
     ef.forEach((f) => {
       if (!TIPOS[f.tipo]) { malos.push(`efecto de la escena ${f.escena}: tipo «${f.tipo}» no existe (${Object.keys(TIPOS).join(', ')})`); return; }

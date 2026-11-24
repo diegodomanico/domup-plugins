@@ -32,8 +32,8 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
 
 2. SEIS ESCENAS EN UN SOLO LIENZO (método del lienzo, shorts-mtl paso 4: es lo que mantiene el MISMO producto y la MISMA
    escala en todas; generadas por separado, cada una inventa otro producto)
-   - El storyboard tiene OCHO cuadros (30-Oct; antes seis). Si el guion trae menos escenas, la última se parte en dos planos (por ejemplo
-     resultado y cierre); si trae más, se juntan. Anotá el mapeo escena→cuadro en storyboard.md.
+   - El storyboard tiene SEIS cuadros, uno por escena (Diego, 24-Nov; del 30-Oct al 24-Nov fueron ocho). Un pedido que ya venía
+     con guion de 8 escenas sigue con 8 cuadros hasta terminar. Anotá el mapeo escena→cuadro en storyboard.md.
    - Subí con nombres ÚNICOS (prefijo con el id del pedido) las 3 fotos de ángulos y los retratos de los personajes:
        node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/cerrar-flow.mjs
        node ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/subir-imagen.mjs <proyecto> <archivos...>
@@ -42,7 +42,7 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
      lienzo: cada cuadro se genera directo en alta (768x1376) con su placa (la que declara "placa"), las 3 fotos del producto,
      las vistas de la hoja de personaje y el bloque PRODUCTO + SCALE LOCK en el prompt. La placa ya fija el lugar y la hoja la
      gente; el lienzo inventaba la distribución del cuarto y el cuadro quedaba entre las dos. Lo que sigue vale solo sin sets.
-   - Generá UN lienzo con todos los cuadros del plan (4 columnas x 2 filas si son 8; 3x2 si el plan viejo trae 6; cada cuadro 9:16) en una sola imagen, con un bloque
+   - Generá UN lienzo con todos los cuadros del plan (3 columnas x 2 filas si son 6; 4x2 si un pedido de antes del 24-Nov trae 8; cada cuadro 9:16) en una sola imagen, con un bloque
      PRODUCTO (copia ultra estricta de las 3 fotos, partes y colores) y un bloque SCALE LOCK (las frases de medidas.md,
      idénticas en cada cuadro), como en scripts/2-lienzo.mjs. Después recreá cada cuadro en alta (768x1376) usando el
      lienzo + las fotos + el retrato como referencia, como en scripts/3-paneles.mjs.
@@ -81,7 +81,7 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
      La caja encierra UN solo producto: si sostiene dos (dos rollos, un par), medí uno. Medí solo cuando el producto está a
      la misma distancia de cámara que la cara (en las manos, cerca del cuerpo); en el piso, sobre una mesa adelante o en
      primer plano, "medida": null (27-Oct, tira LED: dos rollos medidos juntos y uno en el piso dieron +95 % y +32 % estando bien).
-   - Mismo producto: mirá los 8 cuadros juntos al lado de las 3 fotos. Si en algún cuadro el producto cambia de forma,
+   - Mismo producto: mirá los 6 cuadros juntos al lado de las 3 fotos. Si en algún cuadro el producto cambia de forma,
      color, diseño o tamaño, regenerá ese cuadro.
 
 4. SALIDA
@@ -90,9 +90,9 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
      "medida":{"caja":[x_izq,y_arriba,x_der,y_abajo],"dims_cm":[<las medidas reales del producto, las mismas en todos los
      cuadros>],"persona":"adulto|nene7","x_cara":<x de la cara de quien lo sostiene>} o null}]
      El programa compara el lado largo de la caja contra la medida más grande, con la cara de quien lo sostiene como regla.
-     — OCHO entradas, en orden.
+     — SEIS entradas, en orden (ocho solo en un pedido de antes del 24-Nov).
    - angulos/a1.jpg, a2.jpg, a3.jpg: las 3 vistas del producto.
    - storyboard.jpg: hoja con la FILA DE ARRIBA = los 3 ángulos del producto (rotulados «PRODUCTO · FRENTE / LADO / DETALLE»,
-     o «GENERADA») y debajo los 8 cuadros en 2 filas de 4, numerados, con el texto de cada uno abajo.
+     o «GENERADA») y debajo los 6 cuadros en 2 filas de 3, numerados, con el texto de cada uno abajo.
    - medidas.md, producto.md, storyboard.md, ids-flow.txt.
 5. Terminá respondiendo una sola línea: «OK storyboard» o «ERROR: <motivo>».

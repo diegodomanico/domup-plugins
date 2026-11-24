@@ -1,15 +1,15 @@
 # Fábrica de clips DomUP
 
-La fábrica de clips de DomUP, la misma que corre para los clientes, en el Claude de cada vendedor: guion desde virales, preguntas y reseñas; perfil completo de cada avatar; storyboard de 8 cuadros y animación en Google Flow manejado desde Chrome; voces de ElevenLabs; montaje con carátula, subtítulos, logo y cierre; revisores en cada paso; y la galería de fotos que sale del clip.
+La fábrica de clips de DomUP, la misma que corre para los clientes, en el Claude de cada vendedor: guion desde virales, preguntas y reseñas; perfil completo de cada avatar; storyboard de 6 cuadros y animación en Google Flow manejado desde Chrome; voces de ElevenLabs; montaje con carátula, subtítulos, logo y cierre; revisores en cada paso; y la galería de fotos que sale del clip.
 
 ## Habilidades
 
 | Habilidad | Qué hace |
 |---|---|
 | `fabrica-clip` | Orquesta los 7 pasos con su puerta. Empezá por acá: «haceme el clip de MLA…» |
-| `guion-viral` | Relevamiento de virales (YouTube, TikTok, Meta) + preguntas + reseñas → 3 guiones de 8 escenas |
+| `guion-viral` | Relevamiento de virales (YouTube, TikTok, Meta) + preguntas + reseñas → 3 guiones de 6 escenas |
 | `perfil-completo-avatar` | Hoja de personaje de 8 vistas por avatar |
-| `storyboard-flow` | 8 cuadros 9:16 en Flow con 3 fotos del producto, placas y hojas |
+| `storyboard-flow` | 6 cuadros 9:16 en Flow con 3 fotos del producto, placas y hojas |
 | `animacion-flow` | 8 tramos de 4 s en Flow con los bloques fijos de la fábrica |
 | `voces-elevenlabs` | Las frases con la voz de cada personaje |
 | `montaje-clip` | El MP4 final con las reglas de montaje de la fábrica |

@@ -5,7 +5,7 @@ description: Arma un clip de MercadoLibre de punta a punta con el método de la 
 
 # Fábrica de clips DomUP · orquestador
 
-Replicá la fábrica de DomUP tal cual corre en producción. Nada se simplifica: 8 escenas, 3 fotos del producto, hoja de personaje, placas de locación, revisores en cada paso y montaje con carátula, logo a mitad del clip y cierre de marca. La única diferencia con la fábrica es que acá todo corre en la cuenta del vendedor y Flow se maneja desde su Chrome.
+Replicá la fábrica de DomUP tal cual corre en producción. Nada se simplifica: 6 escenas de 2 a 3 s (clip de 12 a 18 s sin carátula ni cierre), 3 fotos del producto, hoja de personaje, placas de locación, revisores en cada paso y montaje con carátula, logo a mitad del clip y cierre de marca. La única diferencia con la fábrica es que acá todo corre en la cuenta del vendedor y Flow se maneja desde su Chrome.
 
 ## Paso 0 · Chequeo de la cocina (antes de gastar una moneda)
 
@@ -32,9 +32,9 @@ Guardá todo en una carpeta de trabajo de la sesión (`clip-<item>/`) con un `pe
 
 | # | Habilidad | Qué sale | Puerta (no se avanza con NO APTO) |
 |---|---|---|---|
-| 1 | `guion-viral` | 3 guiones de 8 escenas desde virales + preguntas + reseñas; el vendedor elige uno | revisor de sentido |
+| 1 | `guion-viral` | 3 guiones de 6 escenas desde virales + preguntas + reseñas; el vendedor elige uno | revisor de sentido |
 | 2 | `perfil-completo-avatar` | hoja de personaje de 8 vistas de cada personaje del guion que no la tenga | la hoja cumple los 5 criterios |
-| 3 | `storyboard-flow` | 8 cuadros 9:16 en Flow con placas, 3 fotos del producto y hojas | `clip_revisar(paso="storyboard")` |
+| 3 | `storyboard-flow` | 6 cuadros 9:16 en Flow con placas, 3 fotos del producto y hojas | `clip_revisar(paso="storyboard")` |
 | 4 | `animacion-flow` | 8 tramos animados de 4 s en Flow | `clip_revisar(paso="escenas")` |
 | 5 | `voces-elevenlabs` | las frases de cada personaje con su `voz_id` y el cierre | duración por escena ≤ 3,5 s |
 | 6 | `montaje-clip` | el MP4 final con carátula, subtítulos, logo, cierre y audio a -14 LUFS | `clip_revisar(paso="final")` |
