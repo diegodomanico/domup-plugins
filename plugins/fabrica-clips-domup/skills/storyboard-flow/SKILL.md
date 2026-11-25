@@ -32,6 +32,8 @@ Consignas originales, a seguir enteras: `references/storyboard-plan.md` (el plan
 
 ## 3 · La puerta (una sola tanda al final)
 
-Achicá los 6 cuadros a 1080 px de lado largo con ffmpeg, pedí `clip_revisar_subir(cantidad=6)`, subí los 6 juntos con el `curl --fail-with-body` que devuelve y pasá los 6 path en **una sola tanda** a `clip_revisar(item_id, paso="storyboard", imagenes=[los 6])` (para cuidar el tope de 30 revisiones/día). Sin terminal (claude.ai en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat.
+Achicá los 6 cuadros a 1080 px de lado largo con ffmpeg, pedí `clip_revisar_subir(cantidad=6, clip_ref?, item_id?, paso="storyboard")`, subí los 6 juntos con el `curl --fail-with-body` que devuelve y pasá los 6 path en **una sola tanda** a `clip_revisar(item_id, paso="storyboard", imagenes=[los 6], clip_ref=...)` (para cuidar el tope de 30 revisiones/día). Sin terminal (claude.ai en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat.
 
 Con NO APTO, regenerá solo los cuadros marcados (de a uno, cambiando su prompt en inglés en el plan) y volvé a revisar una vez. Mostrale `storyboard.jpg` al vendedor con la frase de cada escena debajo: es su segunda decisión. Recién con su OK se anima.
+
+Al terminar el storyboard (o si falla Flow), registrá con `clip_registrar_paso(cust_id?, clip_ref, paso="storyboard", estado="ok"|"error", item_id, detalle={ cuadros: 6, creditos_flow, modelo, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json`. Si falla el registro, avisá y seguí, nunca frenes el clip por eso.

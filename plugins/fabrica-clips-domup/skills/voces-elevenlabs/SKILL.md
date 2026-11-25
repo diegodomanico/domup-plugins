@@ -14,3 +14,5 @@ description: Genera con el conector de ElevenLabs las voces de un clip de Mercad
 5. El cierre de la marca (frase de cierre de la esencia, 3 s y 8 palabras como máximo) va con la voz del narrador.
 
 Cada toma gasta créditos de ElevenLabs del vendedor: nunca repitas una generación para «probar»; si una sale mal, decí por qué y generá una sola vez más.
+
+Al terminar las voces (o si falla), registrá en domup.app con `clip_registrar_paso(cust_id?, clip_ref, paso="voces", estado="ok"|"error", item_id, detalle={ tomas, dur_max_s, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json`. Nunca mandes llaves ni datos personales; si falla el registro, avisá y seguí, nunca frenes el clip por eso.

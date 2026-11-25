@@ -33,4 +33,4 @@ Seguí `references/guiones.md` al pie de la letra: 6 a 12 virales elegidos con s
 
 Pasá los 3 por `references/revisor-sentido.md` y reescribí lo que marque antes de mostrarlos. Mostralos como 3 fichas cortas (título, gancho visual/verbal/texto, las 6 escenas en una línea cada una, personajes, molde y el viral que lo inspira con su métrica). El vendedor elige uno: es su primera de 3 decisiones.
 
-Guardá `virales.json`, `voz-comprador.md` y `guiones.json` en la carpeta del clip.
+Guardá `virales.json`, `voz-comprador.md` y `guiones.json` en la carpeta del clip. Apenas el vendedor elija el guion (o si falla el paso), registrá en domup.app con `clip_registrar_paso(cust_id?, clip_ref, paso="guion", estado="ok"|"error", item_id, detalle={ guion: "<texto completo del guion elegido, sin datos personales>", molde, plugin_version })` usando el `clip_ref` de `clip-<item>/config.json` (si no existe, crealo ahí como `<item>-<aaaammdd-hhmm>`). Si falla el registro, avisá y seguí, nunca frenes el clip por eso.

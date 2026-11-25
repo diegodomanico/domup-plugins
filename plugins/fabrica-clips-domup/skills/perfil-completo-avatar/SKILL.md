@@ -27,3 +27,5 @@ Solo si NO hay `hoja_url_firmada`:
 5. Guardá la lámina en `clip-<item>/elenco/<slot>-lamina.png` y recortala en 8 vistas con `${CLAUDE_PLUGIN_ROOT}/fabrica/lib/cortar_lamina.py` (`<slot>-v1.png` … `-v8.png`). Si el vendedor quiere que quede guardada en DomUP, ofrecé `guardar_avatar` con `referencia_url` (solo con su OK).
 
 Las mascotas (`perro`, `gato`) y los chicos también llevan hoja (sin voz). En mascotas: solo collar, sin ropa ni poses humanas. Los chicos nunca hablan ni tienen contacto ni pase de objetos con un adulto en las escenas.
+
+Al terminar de preparar las hojas del elenco (o si falla), si estás dentro de un clip con `clip_ref` en `clip-<item>/config.json`, llamá `clip_registrar_paso(cust_id?, clip_ref, paso="inicio", estado="ok"|"error", item_id, detalle={ etapa: "perfil_avatar", plugin_version, motivo? })`. Si falla el registro, avisá y seguí, nunca frenes el clip por eso.

@@ -5,7 +5,7 @@ description: Monta el clip final de MercadoLibre con el script de montaje de la 
 
 ## ⛔ Procedimiento obligatorio
 
-- **Siempre con el kit de la fábrica**: se monta con `clip_kit_montaje` + `${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py` (y su plantilla `build-vq.mjs`), nunca con un proyecto inventado de HyperFrames o Remotion.
+- **Siempre con el kit de la fábrica**: se monta con `clip_kit_montaje(cust_id?, clip_ref?, item_id?)` + `${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py` (y su plantilla `build-vq.mjs`), nunca con un proyecto inventado de HyperFrames o Remotion.
 - **Con sesión local** (Claude Code o app de escritorio con carpeta): Claude corre todo él mismo y deja el MP4 en la carpeta del clip (`entrega/<item>-<pedido>.mp4`).
 - **Sin sesión local** (`claude.ai` en el navegador o el panel lateral de Chrome): el render corre en la ejecución de código de Claude y se entrega el MP4 en el chat. **Prohibido pasarle al vendedor zips o bloques de comandos.** Si falta HyperFrames o el entorno en ejecución de código y falla, no se improvisa un proyecto ni se piden zips o comandos: se le indica abrir **Claude Code** o la **app de escritorio** con su carpeta y se sigue ahí.
 - **Panel lateral de Chrome**: desde el panel lateral de Chrome los archivos del chat no se descargan; si se entrega el MP4 en el chat, pedile al vendedor que lo baje desde la **app de escritorio** o desde **`claude.ai` en una pestaña**.
@@ -35,6 +35,8 @@ Lo que el script garantiza (y hay que comprobar al final): carátula 0,6 s; todo
 
 ## Puerta
 
-Si los cuadros están en archivos (Descargas o la carpeta de trabajo): achicalos a 1080 px de lado largo con ffmpeg, pedí `clip_revisar_subir(cantidad=N)`, subí cada uno con el `curl --fail-with-body` que devuelve y pasá los path a `clip_revisar`. Sin terminal (claude.ai en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat.
+Si los cuadros están en archivos (Descargas o la carpeta de trabajo): achicalos a 1080 px de lado largo con ffmpeg, pedí `clip_revisar_subir(cantidad=N, clip_ref?, item_id?, paso="final")`, subí cada uno con el `curl --fail-with-body` que devuelve y pasá los path a `clip_revisar`. Sin terminal (claude.ai en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat.
 
-`clip_revisar(item_id, paso="final", imagenes=[carátula + 1 fotograma por escena + cierre])` y la consigna `references/revisor-final.md`. Con NO APTO se corrige y se revisa una vez más.
+`clip_revisar(item_id, paso="final", imagenes=[carátula + 1 fotograma por escena + cierre], clip_ref=...)` y la consigna `references/revisor-final.md`. Con NO APTO se corrige y se revisa una vez más.
+
+Al terminar el montaje (o si falla), registrá con `clip_registrar_paso(cust_id?, clip_ref, paso="montaje", estado="ok"|"error", item_id, detalle={ duracion_s, lufs, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json`, y con `paso="entregado"` al entregar el MP4 final aprobado. Si falla el registro, avisá y seguí, nunca frenes el clip por eso.

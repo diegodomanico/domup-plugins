@@ -9,7 +9,7 @@ Seguí la consigna textual de la fábrica en `references/extraer-producto.md` y 
 
 ## Paso 1 · Receta y validación del video (5 a 60 s)
 
-1. Llamá `clip_receta(item_id, cust_id)` para traer la ficha verificada, marca, elenco y locaciones (si falta el setup, frená y guiá a completarlo). Guardá `clip-<item>/pedido.json` con `"fuente": "video"`.
+1. Si todavía no existe `clip-<item>/config.json` con `clip_ref`, armá `"clip_ref": "<item>-<aaaammdd-hhmm>"` y guardalo en `clip-<item>/config.json` (si ya existe, leelo sin generar otro). Llamá `clip_receta(item_id, cust_id, clip_ref)` para traer la ficha verificada, marca, elenco y locaciones (si falta el setup, frená y guiá a completarlo). Guardá `clip-<item>/pedido.json` con `"fuente": "video"`.
 2. Validá el archivo de video local con `ffprobe` (sin audio, duración entre 5 y 60 s):
    ```bash
    ffprobe -v error -show_entries stream=codec_type,width,height -show_entries format=duration -of json "<video>"
@@ -44,5 +44,7 @@ Seguí `references/extraer-producto.md`:
 2. Pasalos por el revisor de sentido y mostráselos al vendedor junto con las fotos limpias confirmadas para que elija 1 de los 3 guiones.
 
 ## Paso 5 · Seguir con la fábrica
+
+Al confirmar las fotos limpias y el guion elegido (o si el video falla la validación), registrá con `clip_registrar_paso(cust_id?, clip_ref, paso="desde_video", estado="ok"|"error", item_id, detalle={ duracion_s, fotos_confirmadas, guion: "<texto del guion elegido, sin datos personales>", plugin_version, motivo? })`. Si falla el registro, avisá y seguí, nunca frenes el clip por eso.
 
 Con las fotos limpias en `angulos/a1.jpg..a3.jpg` y el guion elegido, seguí directo con **`storyboard-flow`**, **`animacion-flow`**, **`voces-elevenlabs`** y **`montaje-clip`** (pasando cada tanda por `clip_revisar`).
