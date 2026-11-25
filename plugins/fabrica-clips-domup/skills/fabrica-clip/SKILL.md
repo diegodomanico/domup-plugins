@@ -17,7 +17,7 @@ Verificá y decí en una tabla qué está y qué falta, con el arreglo de cada u
 |---|---|---|
 | Conector DomUP | `clip_receta` responde | Conectarlo en Ajustes → Conectores |
 | Conector ElevenLabs (completo) | `creative_list_voices` responde | Agregar el conector completo `https://api.elevenlabs.io/v1/mcp` |
-| Sesión local con la fábrica instalada | ffmpeg, Python, Node, HyperFrames y el conector `google-flow` con sesión de Google | Correr la habilidad `instalar-fabrica` |
+| Sesión local con la fábrica instalada | ffmpeg, Python, Node, HyperFrames y el conector `domup-flow` con sesión de Google | Correr la habilidad `instalar-fabrica` |
 | Sin sesión local: Claude en Chrome con Flow abierto | Abrí `labs.google/flow` en una pestaña nueva y leé los créditos | Instalar «Claude» desde la Chrome Web Store y entrar a Flow con la cuenta de Google |
 | Ejecución de código | Correr un `ffmpeg -version` | Ajustes → Capacidades → Ejecución de código |
 | Setup de la marca | `clip_receta` no devuelve «falta» | Completar esencia, elenco de 10, 6 voces y 2 locaciones (ver abajo) |

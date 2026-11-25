@@ -2,8 +2,8 @@
 // Uso: node subir-imagen.mjs <PROYECTO_ID> <archivo1> [archivo2 ...]
 // Sirve para subir el retrato oficial de Caro (assets/caro-retrato-oficial.png) a cada proyecto nuevo:
 // la Caro que se crea con createCharacter en otro proyecto sale con OTRA cara.
-import { FlowBrowser, optionsFromEnv } from '../../google-flow-mcp/dist/browser.js';
-import { FlowClient } from '../../google-flow-mcp/dist/flow.js';
+import { FlowBrowser, optionsFromEnv } from '../../google-flow-mcp/dist/lib.js';
+import { FlowClient } from '../../google-flow-mcp/dist/lib.js';
 import { basename, resolve } from 'node:path';
 
 const [PID, ...FILES] = process.argv.slice(2);

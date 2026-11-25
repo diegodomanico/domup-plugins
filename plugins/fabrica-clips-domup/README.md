@@ -14,7 +14,7 @@ La fábrica de clips de DomUP, la misma que corre para los clientes, en el Claud
 | `voces-elevenlabs` | Las frases con la voz de cada personaje |
 | `montaje-clip` | El MP4 final con las reglas de montaje de la fábrica |
 | `galeria-desde-clip` | Fotos 2 a 12 y portada B para el Laboratorio |
-| `instalar-fabrica` | Deja lista tu computadora (ffmpeg, Python, Node, HyperFrames y el conector local `google-flow`) y verifica cada pieza |
+| `instalar-fabrica` | Deja lista tu computadora (ffmpeg, Python, Node, HyperFrames y el conector local `domup-flow`) y verifica cada pieza |
 | `subir-fotos-publicacion` | Carga las fotos de su Flow directo en la publicación, con respaldo y deshacer |
 
 ⛔ ElevenLabs se usa solo para voces. Imágenes o video con ElevenLabs gastan tus créditos: Claude te avisa y espera tu sí.

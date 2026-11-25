@@ -4,7 +4,7 @@ description: Anima en Google Flow (con Claude en Chrome) los 6 cuadros aprobados
 ---
 
 # Animación en Flow (6 tramos de 4 s)
-> **Cómo se maneja Flow.** Con el conector `google-flow` del plugin (sesión local), igual que la fábrica: `flow_create_project`, subir con nombre único, `flow_generate_image` / `flow_generate_video`, `flow_download_media`. Sin sesión local, lo mismo a mano en `labs.google/flow` con Claude en Chrome.
+> **Cómo se maneja Flow.** Con el conector `domup-flow` del plugin (sesión local), igual que la fábrica: `flow_create_project`, `flow_upload_image`, `flow_generate_image` / `flow_generate_video`, `flow_download_media`. Sin sesión local, lo mismo a mano en `labs.google/flow` con Claude en Chrome.
 
 
 Consignas originales: `references/animacion-plan.md` (qué escribe Claude: solo la acción de cada escena) y `references/revisor-animacion.md`. El armado de cada prompt sigue `${CLAUDE_PLUGIN_ROOT}/fabrica/lib/prompt-animacion.mjs` (con sesión local se corre: `node … <carpeta del clip>` escribe los prompts en anim-plan.json): los bloques fijos no se escriben a mano, se copian.

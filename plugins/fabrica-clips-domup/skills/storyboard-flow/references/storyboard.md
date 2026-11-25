@@ -1,4 +1,4 @@
-> **Consigna de la fábrica de clips de DomUP, textual.** En el plugin el PEDIDO es la salida de `clip_receta` (más `preguntas` y `opiniones`), Flow se maneja con Claude en Chrome o con el conector `google-flow` del plugin, y las carpetas de la PC de DomUP se leen como `${CLAUDE_PLUGIN_ROOT}`. Reglas, controles, prompts y cantidades se aplican **igual, sin aflojar nada**.
+> **Consigna de la fábrica de clips de DomUP, textual.** En el plugin el PEDIDO es la salida de `clip_receta` (más `preguntas` y `opiniones`), Flow se maneja con Claude en Chrome o con el conector `domup-flow` del plugin, y las carpetas de la PC de DomUP se leen como `${CLAUDE_PLUGIN_ROOT}`. Reglas, controles, prompts y cantidades se aplican **igual, sin aflojar nada**.
 
 ---
 
@@ -35,8 +35,7 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
    - El storyboard tiene SEIS cuadros, uno por escena (Diego, 24-Nov; del 30-Oct al 24-Nov fueron ocho). Un pedido que ya venía
      con guion de 8 escenas sigue con 8 cuadros hasta terminar. Anotá el mapeo escena→cuadro en storyboard.md.
    - Subí con nombres ÚNICOS (prefijo con el id del pedido) las 3 fotos de ángulos y los retratos de los personajes:
-       node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/cerrar-flow.mjs
-       node ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/subir-imagen.mjs <proyecto> <archivos...>
+      con `flow_upload_image({ project_id, paths, names })` del conector `domup-flow` (sin cerrar Flow ni usar terminal).
      Flow elige imágenes por NOMBRE: nunca referencies una imagen que comparta nombre con otra.
    - SIN LIENZO CUANDO HAY LOCACIONES (Diego, 31-Oct): si plan.json trae "sets_usados" (locaciones con placas), NO generes el
      lienzo: cada cuadro se genera directo en alta (768x1376) con su placa (la que declara "placa"), las 3 fotos del producto,

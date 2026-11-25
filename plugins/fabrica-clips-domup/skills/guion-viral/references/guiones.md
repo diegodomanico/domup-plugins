@@ -1,4 +1,4 @@
-> **Consigna de la fábrica de clips de DomUP, textual.** En el plugin el PEDIDO es la salida de `clip_receta` (más `preguntas` y `opiniones`), Flow se maneja con Claude en Chrome o con el conector `google-flow` del plugin, y las carpetas de la PC de DomUP se leen como `${CLAUDE_PLUGIN_ROOT}`. Reglas, controles, prompts y cantidades se aplican **igual, sin aflojar nada**.
+> **Consigna de la fábrica de clips de DomUP, textual.** En el plugin el PEDIDO es la salida de `clip_receta` (más `preguntas` y `opiniones`), Flow se maneja con Claude en Chrome o con el conector `domup-flow` del plugin, y las carpetas de la PC de DomUP se leen como `${CLAUDE_PLUGIN_ROOT}`. Reglas, controles, prompts y cantidades se aplican **igual, sin aflojar nada**.
 
 ---
 

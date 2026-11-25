@@ -13,7 +13,7 @@ export const RAIZ_SETS = process.env.CLIPS_RAIZ_SETS || join(RAIZ, '_sets').repl
 export const ENV_SECRET = process.env.CLIPS_ENV_SECRET || '';
 export const ENV_LOCAL = process.env.CLIPS_ENV_LOCAL || join(process.cwd(), '.env.local').replace(/\\/g, '/');
 export const SKILL_SCRIPTS = process.env.CLIPS_SKILL_SCRIPTS || join(AQUI, '..', 'vendor', 'shorts-mtl', 'scripts').replace(/\\/g, '/');
-export const PLAYWRIGHT_CORE = process.env.CLIPS_PLAYWRIGHT_CORE || join(AQUI, '..', 'vendor', 'google-flow-mcp', 'node_modules', 'playwright-core', 'index.mjs').replace(/\\/g, '/');
+export const PLAYWRIGHT_CORE = process.env.CLIPS_PLAYWRIGHT_CORE || join(AQUI, '..', 'vendor', 'google-flow-mcp', 'dist', 'lib.js').replace(/\\/g, '/');
 export const FLOW_MCP_DIST = process.env.CLIPS_FLOW_MCP_DIST || join(AQUI, '..', 'vendor', 'google-flow-mcp', 'dist').replace(/\\/g, '/');
 
 export const CHROME_RUTAS = [

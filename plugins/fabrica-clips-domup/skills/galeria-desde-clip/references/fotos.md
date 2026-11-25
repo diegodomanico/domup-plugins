@@ -1,4 +1,4 @@
-> **Consigna de la fábrica de clips de DomUP, textual.** En el plugin el PEDIDO es la salida de `clip_receta` (más `preguntas` y `opiniones`), Flow se maneja con Claude en Chrome o con el conector `google-flow` del plugin, y las carpetas de la PC de DomUP se leen como `${CLAUDE_PLUGIN_ROOT}`. Reglas, controles, prompts y cantidades se aplican **igual, sin aflojar nada**.
+> **Consigna de la fábrica de clips de DomUP, textual.** En el plugin el PEDIDO es la salida de `clip_receta` (más `preguntas` y `opiniones`), Flow se maneja con Claude en Chrome o con el conector `domup-flow` del plugin, y las carpetas de la PC de DomUP se leen como `${CLAUDE_PLUGIN_ROOT}`. Reglas, controles, prompts y cantidades se aplican **igual, sin aflojar nada**.
 
 ---
 
@@ -26,12 +26,7 @@ ser «EL REGALO O LA SORPRESA» (EMOCIÓN): alguien del elenco recibe o descubre
 muestra. El elenco y los lugares salen de plan.json ("personajes", "sets_usados") y de los sets del pedido.
 
 MÉTODO: el mismo del storyboard (skill shorts-mtl y ~/domup-app/docs/videos/ESTANDAR_VIDEOS_PRODUCTO.md, leelos antes):
-SUBIR LAS REFERENCIAS (04-Nov-2026: 14 carruseles de VEO.QUIERO fallaron sin generar nada porque subir-imagen.mjs chocaba con el
-Chrome del conector, que tiene tomado el perfil de Flow): SIEMPRE, inmediatamente antes de cada subida, en este orden:
-    node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/cerrar-flow.mjs
-    node ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/subir-imagen.mjs <proyecto> <archivos...>
-El conector vuelve a abrir su Chrome solo en la próxima llamada. Si la subida igual falla, repetí los dos comandos una vez más
-antes de rendirte.
+SUBIR LAS REFERENCIAS: usá `flow_upload_image({ project_id, paths, names })` del conector `domup-flow` (sube en el mismo navegador del conector, hasta 20 imágenes por llamada, sin cerrar Chrome ni correr comandos de terminal).
 Flow en modo MANUAL, nunca el agente; imágenes subidas con nombre ÚNICO (prefijo fotos-<id del pedido>); personajes SIEMPRE
 desde su retrato con sus rasgos; producto_lock, casa_lock y la frase de escala TEXTUALES en cada prompt; cada prompt pasa por
 python ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/prevuelo.py --lint "<prompt>". Las imágenes de Flow no gastan créditos.
