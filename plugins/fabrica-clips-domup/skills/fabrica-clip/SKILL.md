@@ -42,7 +42,7 @@ Guardá todo en una carpeta de trabajo de la sesión (`clip-<item>/`) con un `pe
 | # | Habilidad | Qué sale | Puerta (no se avanza con NO APTO) |
 |---|---|---|---|
 | 1 | `guion-viral` | 3 guiones de 6 escenas desde virales + preguntas + reseñas; el vendedor elige uno | revisor de sentido |
-| 2 | `perfil-completo-avatar` | hoja de personaje de 8 vistas de cada personaje del guion que no la tenga | la hoja cumple los 5 criterios |
+| 2 | `perfil-completo-avatar` | baja de `clip_receta` la hoja de 8 vistas hecha por DomUP (`hoja_url_firmada`) y la sube a Flow; solo si falta (`tiene_hoja === false`) la genera | la hoja cumple los 5 criterios |
 | 3 | `storyboard-flow` | 6 cuadros 9:16 en Flow con placas, 3 fotos del producto y hojas | `clip_revisar(paso="storyboard")` |
 | 4 | `animacion-flow` | 6 tramos animados de 4 s en Flow | `clip_revisar(paso="escenas")` |
 | 5 | `voces-elevenlabs` | las frases de cada personaje con su `voz_id` y el cierre | duración por escena ≤ 3,5 s |

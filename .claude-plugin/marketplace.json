@@ -12,7 +12,7 @@
       "name": "fabrica-clips-domup",
       "source": "./plugins/fabrica-clips-domup",
       "description": "La fábrica de clips de DomUP: guion viral, elenco, storyboard y animación en Google Flow, voces de ElevenLabs y montaje.",
-      "version": "1.261125.112"
+      "version": "1.261125.230"
     }
   ]
 }
