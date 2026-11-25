@@ -466,8 +466,7 @@ const html = `<!doctype html>
         // desde la primera palabra). El lugar ya está reservado, así que la línea no salta.
         b.ws.forEach((w) => {
           tl.fromTo("#" + w.id, { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "none" }, w.s);
-          if (w.enf) { tl.set("#" + w.id, { color: "#fff", backgroundColor: "#E61B1F", webkitTextStroke: "0px #000" }, w.s); tl.fromTo("#" + w.id, { scale: 1.06 }, { scale: 1, duration: 0.16, ease: "power2.out" }, w.s); }
-          else { tl.fromTo("#" + w.id, { scale: 1.04 }, { scale: 1, duration: 0.14, ease: "power2.out" }, w.s); }
+          if (w.enf) { tl.set("#" + w.id, { color: "#fff", backgroundColor: "#E61B1F", webkitTextStroke: "0px #000" }, w.s); }
         });
       });
       tl.fromTo("#logo", { opacity: 0, scale: 0.8 }, { opacity: 0.9, scale: 1, duration: 0.3, ease: "back.out(2)" }, ${C.logo_t[0]});
