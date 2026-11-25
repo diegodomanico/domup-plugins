@@ -46,12 +46,13 @@ Revisá (Est. paso 9 y las fallas del historial):
     ni la esencia del vendedor… el tipo de letra no es el de la esencia… la voz no es chilena»). La esencia de esta marca: {{MARCA}}
     Mirá en la hoja, la carátula y el cierre: (a) los rótulos, efectos y el panel del cierre usan los colores de la marca, no el
     rojo de otra; (b) la letra de los títulos es la de la esencia (si la esencia nombra una); (c) los botones y textos van en la
-    variante de la marca (tuteo = «CÓMPRALO», «MIRA»; voseo = «COMPRALO», «MIRÁ»); (d) el logo se lee entero (nunca blanco sobre
-    blanco ni chiquito); (e) el título del cierre no repite el nombre que ya dice el logo. (a), (c) y (d) son bloqueantes; (b) y
+    variante de la marca (tuteo = «CÓMPRALO», «MIRA»; voseo = «COMPRALO», «MIRÁ»); (d) el logo se lee entero y nítido (nunca blanco sobre
+    blanco, chiquito ni pixelado/borroso por escalar un logo chico arriba de su tamaño); (e) el título del cierre no repite el nombre que ya dice el logo. (a), (c) y (d) son bloqueantes; (b) y
     (e), menores.
+13. MONTAJE COMPLETO (animaciones + música + audio sano): deben verse rótulos/gráficas animadas del kit (HyperFrames) y el cierre animado con logo; y en la verificación de audio no puede faltar la pista de música de la marca ni haber audio cortado. Todo eso es bloqueante.
 
 SEVERIDAD: «bloqueante» = lo que Diego vería y rechazaría (sin gancho de tres capas, un solo lugar, lo que se nombra no se ve, carátula o cierre cortados, texto sobre una cara, rótulo contra el
-logo, placa sobre el producto, subtítulo distinto al guion, texto prohibido). «menor» = lo demás.
+logo, placa sobre el producto, subtítulo distinto al guion, texto prohibido, logo pixelado, falta de animaciones HyperFrames del kit, falta de música o audio cortado). «menor» = lo demás.
 
 Respondé SOLO con este JSON, sin nada antes ni después:
 {"apto": true|false, "fallas": [{"severidad": "bloqueante|menor", "donde": "<segundo o cuadro>", "falla": "<qué está mal, concreto>"}], "revisado": "<qué miraste en concreto>"}

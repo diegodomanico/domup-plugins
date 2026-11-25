@@ -181517,12 +181517,12 @@ var request2 = import_index2.default.request;
 var _electron = import_index2.default._electron;
 var _android = import_index2.default._android;
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/browser.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/browser.js
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { mkdirSync as mkdirSync2 } from "node:fs";
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/bridge.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/bridge.js
 var BRIDGE_JS = String.raw`
 (() => {
   if (window.__flowMcp && window.__flowMcp.version === 3) return 'present';
@@ -181585,15 +181585,17 @@ var BRIDGE_JS = String.raw`
 })()
 `;
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/browser.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/browser.js
 var FLOW_ORIGIN = "https://flow.google.com";
 function optionsFromEnv() {
   const profileDir2 = process.env.FLOW_PROFILE_DIR || join(homedir(), ".google-flow-mcp", "profile");
+  const isMac = process.platform === "darwin";
+  const headless = isMac ? process.env.DOMUP_FLOW_HEADLESS === "1" : process.env.DOMUP_FLOW_HEADLESS === "1" || process.env.FLOW_HEADLESS === "1";
   return {
     cdpUrl: process.env.FLOW_CDP_URL || void 0,
     profileDir: profileDir2,
     channel: process.env.FLOW_BROWSER_CHANNEL || "chrome",
-    headless: process.env.FLOW_HEADLESS === "1",
+    headless,
     executablePath: process.env.FLOW_CHROME_PATH || void 0
   };
 }
@@ -181687,12 +181689,12 @@ var FlowBrowser = class {
   }
 };
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/flow.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/flow.js
 import { appendFileSync, copyFileSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, extname, join as join2, resolve } from "node:path";
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/protocol.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/protocol.js
 var RPC = {
   // projects
   listProjects: "UpteDb",
@@ -182105,7 +182107,7 @@ function extractA2uiText(raw) {
   return [...new Set(out)].join("\n");
 }
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/ui.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/ui.js
 var GEN_RPCS = /rpcids=(MZZa6b|YhhmEf|eb1hJf|nprQif|jIps6|fZytfe|ogiZ0b)\b/;
 var STREAM_CHAT = /FlowCreationAgentService\/StreamChat/;
 var UiError = class extends Error {
@@ -182148,12 +182150,75 @@ var FlowUi = class {
     this.page = page;
   }
   // ------------------------------------------------------------------ navigation
+  normalizePath(pathname) {
+    return pathname.replace(/\/+$/, "");
+  }
+  assertProjectUrl(projectId2) {
+    const expected = `/project/${projectId2}`;
+    let parsed;
+    try {
+      parsed = new URL(this.page.url());
+    } catch {
+      throw new UiError(`Flow no abri\xF3 el proyecto ${projectId2} (URL actual: ${this.page.url()}).`);
+    }
+    const clean = this.normalizePath(parsed.pathname);
+    if (clean !== expected && !clean.startsWith(`${expected}/`)) {
+      throw new UiError(`Flow qued\xF3 en otra URL (${parsed.href}) en vez de /project/${projectId2}.`);
+    }
+  }
+  async detectVisibleRecaptcha() {
+    return this.page.evaluate(() => {
+      const sels = [
+        'iframe[src*="recaptcha"]',
+        'iframe[title*="reCAPTCHA" i]',
+        ".g-recaptcha",
+        '[aria-label*="reCAPTCHA" i]',
+        '[role="dialog"]'
+      ];
+      for (const sel of sels) {
+        for (const el of document.querySelectorAll(sel)) {
+          if (el.closest(".grecaptcha-badge") || el.classList.contains("grecaptcha-badge"))
+            continue;
+          const st = window.getComputedStyle(el);
+          if (st.display === "none" || st.visibility === "hidden" || Number(st.opacity) === 0)
+            continue;
+          if (sel === '[role="dialog"]' && !el.querySelector('iframe[src*="recaptcha"], iframe[title*="reCAPTCHA" i], .g-recaptcha')) {
+            continue;
+          }
+          const r = el.getBoundingClientRect();
+          if (r.width >= 120 && r.height >= 80)
+            return true;
+        }
+      }
+      return false;
+    }).catch(() => false);
+  }
+  async throwIfRecaptcha() {
+    if (await this.detectVisibleRecaptcha()) {
+      throw new UiError("resolv\xE9 la verificaci\xF3n en la ventana de Flow y reintent\xE1");
+    }
+  }
   async openProject(projectId2, sub = "") {
     const target = `/project/${projectId2}${sub}`;
-    if (new URL(this.page.url()).pathname !== target) {
+    let curPath = "";
+    try {
+      curPath = this.normalizePath(new URL(this.page.url()).pathname);
+    } catch {
+    }
+    if (curPath !== this.normalizePath(target)) {
       await this.page.goto("https://flow.google.com" + target + "?hl=en", { waitUntil: "domcontentloaded" });
     }
-    await this.generateButton().waitFor({ state: "visible", timeout: 3e4 });
+    await this.page.waitForFunction((id) => window.location.pathname === `/project/${id}` || window.location.pathname.startsWith(`/project/${id}/`), projectId2, { timeout: 15e3 }).catch(() => {
+    });
+    await this.throwIfRecaptcha();
+    this.assertProjectUrl(projectId2);
+    await this.generateButton().waitFor({ state: "visible", timeout: 3e4 }).catch(async (err) => {
+      await this.throwIfRecaptcha();
+      this.assertProjectUrl(projectId2);
+      throw err;
+    });
+    await this.throwIfRecaptcha();
+    this.assertProjectUrl(projectId2);
     await this.page.waitForTimeout(800);
   }
   // ------------------------------------------------------------------ composer parts
@@ -182171,9 +182236,70 @@ var FlowUi = class {
         n.setAttribute("data-flowmcp-composer", "1");
       return !!n;
     });
-    if (!ok2)
+    if (!ok2) {
+      await this.throwIfRecaptcha();
       throw new UiError("Flow composer not found on this page.");
+    }
     return this.page.locator("[data-flowmcp-composer]");
+  }
+  async listComposerButtonTexts() {
+    return this.page.evaluate(() => {
+      const vis = (e) => {
+        const h = e;
+        const r = h.getBoundingClientRect();
+        const st = window.getComputedStyle(h);
+        return !!(h.offsetParent && r.width > 0 && r.height > 0 && st.visibility !== "hidden" && st.display !== "none");
+      };
+      const comp = document.querySelector("[data-flowmcp-composer]");
+      const minY = window.innerHeight * 0.35;
+      const btns = [...document.querySelectorAll('button, [role="button"], [role="tab"], [role="switch"], mat-button-toggle button')].filter((e) => vis(e) && (comp && comp.contains(e) || e.getBoundingClientRect().top >= minY));
+      const out = [];
+      for (const b of btns) {
+        const h = b;
+        const raw = (h.innerText || h.textContent || h.getAttribute("aria-label") || "").trim().replace(/\s+/g, " ");
+        if (raw && !out.includes(raw))
+          out.push(raw);
+      }
+      return out.slice(0, 30);
+    }).catch(() => []);
+  }
+  async takeScreenshot() {
+    const raw = await this.page.screenshot({ type: "png" });
+    const url = this.page.url();
+    const scaled = await this.page.evaluate(async (rawB64) => {
+      try {
+        const bin = atob(rawB64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++)
+          bytes[i] = bin.charCodeAt(i);
+        const blob = new Blob([bytes], { type: "image/png" });
+        const bmp = await createImageBitmap(blob);
+        const maxW = 900;
+        const scale = bmp.width > maxW ? maxW / bmp.width : 1;
+        const w = Math.max(1, Math.round(bmp.width * scale));
+        const h = Math.max(1, Math.round(bmp.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx)
+          return null;
+        ctx.drawImage(bmp, 0, 0, w, h);
+        bmp.close();
+        const dataUrl = canvas.toDataURL("image/png");
+        const comma = dataUrl.indexOf(",");
+        if (comma < 0)
+          return null;
+        return { base64: dataUrl.slice(comma + 1), width: w, height: h };
+      } catch {
+        return null;
+      }
+    }, raw.toString("base64")).catch(() => null);
+    if (scaled?.base64) {
+      return { ...scaled, url };
+    }
+    const vp = this.page.viewportSize() ?? { width: 1280, height: 720 };
+    return { base64: raw.toString("base64"), width: vp.width, height: vp.height, url };
   }
   async clearPrompt() {
     const c = await this.tagComposer();
@@ -182246,16 +182372,39 @@ var FlowUi = class {
     return manual;
   }
   async setMode(want) {
+    await this.throwIfRecaptcha();
+    const findAgentBtn = async (c) => {
+      const candidates = [
+        c.locator('button[aria-label*="Agent" i], [role="switch"][aria-label*="Agent" i], button[aria-label*="Agente" i], [role="switch"][aria-label*="Agente" i]'),
+        c.locator("button", { hasText: /\bAgent\b|\bAgente\b/i }),
+        c.locator('[role="switch"], [role="tab"], [role="button"]', { hasText: /\bAgent\b|\bAgente\b/i }),
+        c.locator("button.switch").filter({ hasText: /^\s*spark(_off)?\s*$/i }),
+        this.page.locator('button[aria-label*="Agent" i]:visible, button[aria-label*="Agente" i]:visible'),
+        this.page.locator('button:visible, [role="switch"]:visible, [role="tab"]:visible').filter({ hasText: /\bAgent\b|\bAgente\b/i })
+      ];
+      for (const loc of candidates) {
+        if (await loc.count().catch(() => 0) > 0) {
+          const first = loc.first();
+          if (await first.isVisible().catch(() => false))
+            return first;
+        }
+      }
+      return null;
+    };
     const c0 = await this.tagComposer();
     if (!await c0.locator('button[aria-label="Settings trigger"]').isVisible().catch(() => false)) {
       if (want === "agent")
         return;
-      await c0.locator("button", { hasText: /^\s*Agent\s*$/ }).first().click().catch(() => {
-      });
+      const btn = await findAgentBtn(c0);
+      if (btn)
+        await btn.click().catch(() => {
+        });
       await this.page.waitForTimeout(1500);
+      await this.throwIfRecaptcha();
       const c1 = await this.tagComposer();
       if (!await c1.locator('button[aria-label="Settings trigger"]').isVisible().catch(() => false)) {
-        throw new UiError("Flow shows only the agent composer in this project and clicking Agent did not bring back manual mode. Use flow_agent_chat.");
+        const botones2 = await this.listComposerButtonTexts();
+        throw new UiError(`Flow shows only the agent composer in this project and clicking Agent did not bring back manual mode. Use flow_agent_chat. Botones visibles cerca del compositor: ${botones2.length ? botones2.map((b) => JSON.stringify(b)).join(", ") : "(ninguno)"}`);
       }
       return;
     }
@@ -182263,10 +182412,14 @@ var FlowUi = class {
       if (await this.isManualMode() === (want === "manual"))
         return;
       const c = await this.tagComposer();
-      await c.locator("button", { hasText: /^\s*Agent\s*$/ }).first().click();
+      const btn = await findAgentBtn(c);
+      if (btn)
+        await btn.click();
       await this.page.waitForTimeout(800);
+      await this.throwIfRecaptcha();
     }
-    throw new UiError(`Could not switch Flow's composer to ${want} mode.`);
+    const botones = await this.listComposerButtonTexts();
+    throw new UiError(`Could not switch Flow's composer to ${want} mode. Botones visibles cerca del compositor: ${botones.length ? botones.map((b) => JSON.stringify(b)).join(", ") : "(ninguno)"}`);
   }
   /** Apply settings and return Flow's own credit quote. */
   async configure(s) {
@@ -182349,11 +182502,14 @@ var FlowUi = class {
   }
   /** Press Generate and return Flow's own generation response. */
   async submitGeneration(timeoutMs = 6e4) {
+    await this.throwIfRecaptcha();
     const wait2 = this.page.waitForResponse((r) => GEN_RPCS.test(r.url()) && r.request().method() === "POST", { timeout: timeoutMs });
     await this.generateButton().click();
     const resp = await wait2.catch(() => void 0);
-    if (!resp)
+    if (!resp) {
+      await this.throwIfRecaptcha();
       throw new UiError("Flow did not send a generation request after pressing Generate (a setting may be missing or the button was disabled).");
+    }
     return parseBatch(await resp.text());
   }
   /** Send the composer to the agent and return all StreamChat chunks of that turn. */
@@ -182416,7 +182572,7 @@ var FlowUi = class {
   }
 };
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/flow.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/flow.js
 var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 var VALID_UPLOAD_EXT = /* @__PURE__ */ new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 var FlowError = class extends Error {
@@ -182511,6 +182667,13 @@ var FlowClient = class {
   }
   async status() {
     return this.browser.evaluate("status");
+  }
+  async screenshot(projectId2) {
+    return this.withUi(async (ui) => {
+      if (projectId2)
+        await ui.openProject(projectId2);
+      return ui.takeScreenshot();
+    });
   }
   // -------------------------------------------------------------- account & models
   async credits() {
@@ -182956,7 +183119,7 @@ var FlowClient = class {
   static _uuid = newUuid;
 };
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/export.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/export.js
 import { spawn } from "node:child_process";
 import { mkdirSync as mkdirSync3, createWriteStream, writeFileSync } from "node:fs";
 import { join as join3, resolve as resolve2 } from "node:path";
@@ -183016,7 +183179,7 @@ async function exportScene(urls, o) {
   return { path: outPath, clips: urls.length, width: W, height: H };
 }
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/index.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/index.js
 var browser = new FlowBrowser(optionsFromEnv());
 var flow = new FlowClient(browser);
 var DEFAULT_MAX_CREDITS = Number(process.env.FLOW_MAX_CREDITS_PER_CALL ?? 20);
@@ -183042,6 +183205,26 @@ server2.registerTool("flow_status", {
   inputSchema: {},
   annotations: { readOnlyHint: true }
 }, wrap(async () => ({ ...await flow.status(), credits: await flow.credits() })));
+server2.registerTool("flow_screenshot", {
+  title: "Capture Flow browser screenshot",
+  description: "Take a scaled-down PNG screenshot of the Flow browser tab to inspect the current UI state.",
+  inputSchema: {
+    project_id: projectId.optional().describe("Optional project id to open first before taking the screenshot.")
+  },
+  annotations: { readOnlyHint: true }
+}, async ({ project_id }) => {
+  try {
+    const shot = await flow.screenshot(project_id);
+    return {
+      content: [
+        { type: "image", data: shot.base64, mimeType: "image/png" },
+        { type: "text", text: JSON.stringify({ url: shot.url, width: shot.width, height: shot.height }) }
+      ]
+    };
+  } catch (e) {
+    return fail(e);
+  }
+});
 server2.registerTool("flow_list_models", {
   title: "List Flow models",
   description: "Video models with key, family, mode (text/references/start_frame/start_end_frames/edit/extend/upsample), duration, resolution and credit cost (highest tier price).",

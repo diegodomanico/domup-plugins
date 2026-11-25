@@ -26,7 +26,7 @@ Revisá cada escena a lo largo de TODO su tiempo (lo que cambia a mitad de escen
 2. PRODUCTO: que no cambie de forma, color, tamaño ni cantidad de piezas en ningún cuadro; que no se agrande al acercarse.
 3. CARAS: que no deriven del retrato (otra cara, otros ojos, otro pelo) a medida que avanza la escena.
 4. COLADOS: personas, manos de más, otro producto, texto, logos, marcas de agua que aparecen a mitad de escena.
-5. FÍSICA: contacto real de las manos, objetos que no flotan ni se atraviesan, lo conectado queda rígido. PIEZAS EN SU LUGAR
+5. FÍSICA Y ACCIONES FÍSICAMENTE POSIBLES: contacto real de las manos, objetos que no flotan ni se atraviesan, lo conectado queda rígido. NO APTO (`bloqueante`) si un animal, persona u objeto hace algo irreal o anatómicamente imposible (por ejemplo: un perro que lame con una lengua que atraviesa algo, objetos que flotan sin sostén, manos/dedos o cuerpos que atraviesan cosas sólidas). PIEZAS EN SU LUGAR
    (23-Oct, se escapó en la v4): cada pieza que alguien saca, usa o guarda sale de SU compartimento y vuelve a él según
    producto.md (un marcador sale de la fila de marcadores, no de la bandeja de acuarelas). Seguí la mano cuadro por cuadro: si
    saca o guarda una pieza en el compartimento equivocado, o la pieza cambia de tipo en la mano, es bloqueante.
@@ -34,7 +34,7 @@ Revisá cada escena a lo largo de TODO su tiempo (lo que cambia a mitad de escen
 7. Que pase lo que tenía que pasar («Lo que tenía que pasar»).
 
 SEVERIDAD: «bloqueante» = otro producto o tamaño fuera de ± 20 %, cara que deriva, persona colada, corte interno antes de
-1,5 s, la acción no ocurre, pieza sacada o guardada en el compartimento equivocado, labios que no acompañan la frase a cámara. «menor» = lo demás. Si una escena tiene un tramo bueno, decilo en "usable" (segundos desde el
+1,5 s, la acción no ocurre, acción físicamente irreal o anatómicamente imposible (lengua/mano que atraviesa objetos, objeto flotando, anatomía imposible), pieza sacada o guardada en el compartimento equivocado, labios que no acompañan la frase a cámara. «menor» = lo demás. Si una escena tiene un tramo bueno, decilo en "usable" (segundos desde el
 inicio del video): el montaje usa solo ese tramo. Si el tramo bueno dura 1,5 s o más, la escena no es bloqueante.
 
 Respondé SOLO con este JSON, sin nada antes ni después:

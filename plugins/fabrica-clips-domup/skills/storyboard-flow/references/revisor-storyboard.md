@@ -61,9 +61,10 @@ Revisá cuadro por cuadro y después ENTRE cuadros:
 5. (Los cuadros en la cabina roja del confesionario de la marca son correctos: no cuentan como otra casa.) La casa es la misma en todos los cuadros (distintos ambientes de la MISMA casa, como el living y el comedor, están bien;
    otra casa, otra luz o otro estilo, no). El texto impreso que el producto real tiene (por ejemplo su nombre en la tapa)
    está bien si se parece al real; si sale deformado, anotalo en notas, no como falla.
+6. ACCIONES FÍSICAMENTE POSIBLES: NO APTO (`bloqueante`) si un animal, persona u objeto hace algo irreal o anatómicamente imposible (por ejemplo: un perro que lame con una lengua que atraviesa un objeto o el aire de forma imposible, objetos que flotan sin sostén, manos o brazos con articulaciones imposibles o que atraviesan cosas sólidas).
 
 SEVERIDAD: «bloqueante» = otro producto (forma, color de una parte grande, cómo abre), escala fuera de ± 20 %, personaje o
-animal distinto a su retrato (cara, ropa, raza), otra casa, texto inventado legible. «menor» = detalles del estampado,
+animal distinto a su retrato (cara, ropa, raza), acción físicamente irreal o anatómicamente imposible, otra casa, texto inventado legible. «menor» = detalles del estampado,
 objetos chicos del fondo, dibujos infantiles, el nombre impreso algo deformado. "apto" es false solo con alguna bloqueante.
 Un personaje que ocupa menos de un tercio del alto del cuadro (al fondo, lejos): antes de marcar una falla de pelo, peinado o
 accesorio, mirá la parte de arriba de su cabeza con atención; si la colita, el scrunchie o el detalle se ve aunque sea chico,

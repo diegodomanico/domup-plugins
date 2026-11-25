@@ -63,10 +63,13 @@ def main(panel, foto, titulo, nombre, salida, recorte=None):
     cx, cy = 30, H - card.height - 30
     sh = Image.new('RGBA', (W, H)); ImageDraw.Draw(sh).rounded_rectangle((cx + 4, cy + 8, cx + card.width + 4, cy + card.height + 8), 22, fill=(0, 0, 0, 120))
     c = Image.alpha_composite(c, sh.filter(ImageFilter.GaussianBlur(10))); c.paste(card, (cx, cy), card)
-    # logo (abajo a la derecha)
-    lg = Image.open(LOGO).convert('RGBA'); ls = 140; lg = lg.resize((ls, int(lg.height * ls / lg.width)), Image.LANCZOS)
-    lg = tarjeta(lg, 30)
-    c.paste(lg, (W - ls - 30, H - lg.height - 30), lg)
+    # logo (abajo a la derecha): nunca escalar por encima de su ancho original (evita pixelado)
+    lg = Image.open(LOGO).convert('RGBA')
+    ls = min(140, lg.width) if lg.width > 0 else 140
+    if ls != lg.width:
+        lg = lg.resize((ls, max(1, int(lg.height * ls / lg.width))), Image.LANCZOS)
+    lg = tarjeta(lg, min(30, max(4, min(lg.width, lg.height) // 4)))
+    c.paste(lg, (W - lg.width - 30, H - lg.height - 30), lg)
     if contraste((255, 255, 255), ROJO) < 4.5: raise SystemExit(f'✗ el blanco sobre la franja {ROJO} no llega a 4,5:1: oscurecer el color en marcas/')
     c.convert('RGB').save(salida, quality=95)
     print(salida, '· contraste título', round(contraste((255, 255, 255), ROJO), 2), ': 1 · nombre', round(contraste((26, 26, 26), (255, 255, 255)), 2), ': 1')

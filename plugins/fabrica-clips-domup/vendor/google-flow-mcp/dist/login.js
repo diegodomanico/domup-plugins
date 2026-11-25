@@ -160110,12 +160110,12 @@ var request2 = import_index.default.request;
 var _electron = import_index.default._electron;
 var _android = import_index.default._android;
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/browser.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/browser.js
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { mkdirSync } from "node:fs";
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/bridge.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/bridge.js
 var BRIDGE_JS = String.raw`
 (() => {
   if (window.__flowMcp && window.__flowMcp.version === 3) return 'present';
@@ -160178,15 +160178,17 @@ var BRIDGE_JS = String.raw`
 })()
 `;
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/browser.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/browser.js
 var FLOW_ORIGIN = "https://flow.google.com";
 function optionsFromEnv() {
   const profileDir2 = process.env.FLOW_PROFILE_DIR || join(homedir(), ".google-flow-mcp", "profile");
+  const isMac = process.platform === "darwin";
+  const headless = isMac ? process.env.DOMUP_FLOW_HEADLESS === "1" : process.env.DOMUP_FLOW_HEADLESS === "1" || process.env.FLOW_HEADLESS === "1";
   return {
     cdpUrl: process.env.FLOW_CDP_URL || void 0,
     profileDir: profileDir2,
     channel: process.env.FLOW_BROWSER_CHANNEL || "chrome",
-    headless: process.env.FLOW_HEADLESS === "1",
+    headless,
     executablePath: process.env.FLOW_CHROME_PATH || void 0
   };
 }
@@ -160280,7 +160282,7 @@ var FlowBrowser = class {
   }
 };
 
-// ../AppData/Local/Temp/flow-bundle-stage-bzcKyo/login.js
+// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/login.js
 var opts = optionsFromEnv();
 if (opts.cdpUrl) {
   console.log("FLOW_CDP_URL is set: the MCP uses your own Chrome, so no separate login is needed.");

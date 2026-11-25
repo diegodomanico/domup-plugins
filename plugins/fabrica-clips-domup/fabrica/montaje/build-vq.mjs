@@ -354,8 +354,8 @@ const html = `<!doctype html>
       .chip { position: absolute; left: 50%; top: 790px; transform: translateX(-50%); opacity: 0; z-index: 10; white-space: nowrap; font-weight: 900; font-size: 34px; color: var(--m1); background: #fff; padding: 8px 20px; border-radius: 6px; border-left: 8px solid var(--m2); }
       .chip.small { font-size: 20px; padding: 5px 12px; letter-spacing: .06em; background: rgba(255,255,255,.92); }
       .chip.big { top: 150px; font-size: 58px; line-height: 1.05; text-align: center; color: #fff; background: var(--m1); border: 3px solid var(--m2); border-radius: 14px; padding: 18px 30px; }
-      #logo { position: absolute; right: 26px; top: 48px; width: 176px; height: 186px; opacity: 0; z-index: 12; background: #fff; border-radius: 24px; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
-      #logo img, .o-logo .ov { position: absolute; left: 8px; top: 8px; width: 160px; height: 170px; }
+      #logo { position: absolute; right: 26px; top: 48px; width: 176px; height: 186px; opacity: 0; z-index: 12; background: #fff; border-radius: 24px; box-shadow: 0 6px 18px rgba(0,0,0,.35); display: grid; place-items: center; padding: 8px; }
+      #logo img, .o-logo .ov { grid-area: 1 / 1; max-width: 160px; max-height: 170px; width: auto; height: auto; object-fit: contain; }
       .cerr { opacity: 0; }
       .mira { display: none; }
       /* cierre MTL */

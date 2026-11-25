@@ -15,14 +15,14 @@ La fábrica de clips de DomUP, la misma que corre para los clientes, en el Claud
 | `voces-elevenlabs` | Las frases con la voz de cada personaje |
 | `montaje-clip` | El MP4 final con las reglas de montaje de la fábrica |
 | `galeria-desde-clip` | Fotos 2 a 12 y portada B para el Laboratorio |
-| `instalar-fabrica` | Deja lista tu computadora en Windows con doble clic en `instalar/instalar-fabrica.cmd` (sin comandos de terminal) y verifica `domup-flow` |
+| `instalar-fabrica` | Deja lista tu computadora en Windows (`instalar/instalar-fabrica.cmd`) o Mac (`instalar/instalar-fabrica.command`) con doble clic y verifica `domup-flow`. Pedilo con «instalá la fábrica de clips» |
 | `subir-fotos-publicacion` | Carga las fotos de su Flow directo en la publicación, con respaldo y deshacer |
 
 ⛔ ElevenLabs se usa solo para voces. Imágenes o video con ElevenLabs gastan tus créditos: Claude te avisa y espera tu sí.
 
 ## Qué hace falta
 
-1. **Instalador en Windows (sin terminal)**: ejecutá con doble clic `instalar/instalar-fabrica.cmd` dentro de la carpeta del plugin (instala ffmpeg, Python 3.12 + OpenCV/Pillow/numpy y Node LTS si faltan, arma `Documentos\Fabrica DomUP\clips` y `.env.local`, y abre `.env.local` para pegar `ELEVENLABS_API_KEY`).
+1. **Instalador en Windows o Mac (sin terminal)**: ejecutá con doble clic `instalar/instalar-fabrica.cmd` (Windows) o `instalar/instalar-fabrica.command` (Mac) dentro de la carpeta del plugin —o decile a Claude «**instalá la fábrica de clips**»— (instala ffmpeg, Python 3.12 + OpenCV/Pillow/numpy, Node 20+ y HyperFrames si faltan, arma `Fabrica DomUP/clips` y `.env.local`, y abre `.env.local` para pegar `ELEVENLABS_API_KEY`).
 2. **Conector DomUP** (`https://mcp.domup.app/api/mcp`), con la cuenta vinculada y el setup de Clips completo en domup.app: esencia, elenco, voces y 2 locaciones.
 3. **Conector completo de ElevenLabs** (`https://api.elevenlabs.io/v1/mcp`) con la API key cargada en domup.app → Clips → Tus cuentas.
 4. **Conector local `domup-flow`** (incluido en el plugin) o **Claude en Chrome** con **Google Flow** abierto (`labs.google/flow`). Créditos: 50 gratis por día; Google AI Pro suma 1.000 por mes.
