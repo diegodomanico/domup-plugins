@@ -107,8 +107,9 @@ export function guardiaAnimacion(dir) {
     }
     fr.forEach((f) => {
       const p = elenco[f.personaje];
+      const esSecundarioAdulto = ['mujer_2', 'hombre_2', 'mujer_mayor', 'hombre_mayor'].includes(f.personaje);
       if (!p) malos.push(`escena ${n}: «${f.personaje}» no está en el elenco`);
-      else if (!p.voz_id) malos.push(`escena ${n}: habla ${p.nombre}, que no tiene voz de ElevenLabs (chicos y animales no hablan; lo narra un adulto)`);
+      else if (!p.voz_id && !esSecundarioAdulto) malos.push(`escena ${n}: habla ${p.nombre}, que no tiene voz de ElevenLabs (chicos y animales no hablan; lo narra un adulto)`);
       if (!['off', 'camara'].includes(f.modo)) malos.push(`escena ${n}: modo «${f.modo}», tiene que ser off o camara`);
       if (palabras(f.texto || '') > 10) malos.push(`escena ${n}: «${f.texto}» tiene ${palabras(f.texto)} palabras; hasta 10`);
       if (PROHIBIDO.test(f.texto || '')) malos.push(`escena ${n}: «${f.texto}» promete o deriva afuera (precio, envío, redes…)`);
@@ -129,7 +130,7 @@ export function guardiaAnimacion(dir) {
   const cv = a.cierre_voz;
   const limpio = (t) => String(t || '').replace(/[.!¡¿?]/g, '').trim();
   if (esencia.cierre && (!cv || limpio(cv.texto) !== limpio(esencia.cierre))) malos.push(`falta cierre_voz con el cierre de la marca textual: «${esencia.cierre}»`);
-  if (cv && !elenco[cv.personaje]?.voz_id) malos.push(`cierre_voz: «${cv.personaje}» no tiene voz de ElevenLabs`);
+  if (cv && !elenco[cv.personaje]?.voz_id && !['mujer_2', 'hombre_2', 'mujer_mayor', 'hombre_mayor'].includes(cv.personaje)) malos.push(`cierre_voz: «${cv.personaje}» no tiene voz de ElevenLabs`);
   if (cv && pedido.cierre_audio?.texto && limpio(cv.texto) !== limpio(pedido.cierre_audio.texto)) malos.push(`cierre_voz: tiene que ser textual la toma verificada «${pedido.cierre_audio.texto}»`);
   // Voseo (07-Oct): imperativo con pronombre pegado sin tilde en lo que va a la voz → ElevenLabs lo lee en tuteo.
   const VOSEO = /\b(encontr|sum|mir|prob|us|llev|compr|regal|pon|guard|arm|prend|abr|elegi|cambi|prepar|disfrut|aprovech)(a|e|i)(lo|la|los|las|le|les|me|te|nos)\b/i;
