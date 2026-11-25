@@ -20,7 +20,7 @@ La hoja de 8 vistas la prepara DomUP una vez por avatar. Sin hoja, Flow cambia l
 ## 2 · Caso borde: si `tiene_hoja === false` (la hoja todavía no está en DomUP)
 
 Solo si NO hay `hoja_url_firmada`:
-1. `mis_avatares` (o el elenco de `clip_receta`) → nombre, slot, semilla y retrato firmado del personaje. `clip_kit_montaje` → vestuario fijo por slot (en inglés, textual).
+1. `mis_avatares` (o el elenco de `clip_receta`) → nombre, slot, semilla y retrato firmado del personaje. `clip_kit_montaje` → vestuario fijo por slot (en inglés, textual). **Regla de marca (Diego, 24-Nov)**: al menos un avatar adulto de la marca lleva el logo de la marca bordado chico en el pecho (`with the <marca> logo embroidered small on the left chest`) en su vestuario fijo, y la hoja de personaje se genera con ese vestuario textual.
 2. Con `domup-flow` (sin sesión local, en `labs.google/flow` con Claude en Chrome): creá un proyecto «Elenco <marca> <slot>» (`flow_create_project`) y subí el retrato con `flow_upload_image({ project_id, paths, names: ["elenco-<cust>-<slot>-retrato.png"] })`.
 3. Generá la **lámina maestra** con el prompt textual de `references/hoja-de-personaje.md` (personas o mascotas según el `slot`, 16:9, 2 variantes, el retrato como referencia, el vestuario textual): 8 paneles en 4x2, fila de arriba busto (frente, ¾ derecha, perfil mirando a izquierda, ¾ izquierda), fila de abajo (perfil mirando a derecha, cuerpo entero de frente, cuerpo entero de costado, de espaldas). Sin texto.
 4. Bajá las 2 variantes y elegí la que cumple los 5 criterios de `references/hoja-de-personaje.md`. Si ninguna cumple, generá 2 más una sola vez.

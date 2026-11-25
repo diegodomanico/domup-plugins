@@ -34,9 +34,12 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
    escala en todas; generadas por separado, cada una inventa otro producto)
    - El storyboard tiene SEIS cuadros, uno por escena (Diego, 24-Nov; del 30-Oct al 24-Nov fueron ocho). Un pedido que ya venía
      con guion de 8 escenas sigue con 8 cuadros hasta terminar. Anotá el mapeo escena→cuadro en storyboard.md.
-   - Subí con nombres ÚNICOS (prefijo con el id del pedido) las 3 fotos de ángulos y los retratos de los personajes:
+   - Subí con nombres ÚNICOS (prefijo con el id del pedido) las 3 fotos de ángulos, los retratos de los personajes y, si existe logo.png en la carpeta, el logo de la marca (<id del pedido>-logo.png):
       con `flow_upload_image({ project_id, paths, names })` del conector `domup-flow` (sin cerrar Flow ni usar terminal).
-     Flow elige imágenes por NOMBRE: nunca referencies una imagen que comparta nombre con otra.
+     Flow elige imágenes por NOMBRE: nunca referencies una imagen que comparta nombre con otra. En cada cuadro donde plan.json
+     declare "logo": "locacion" o "ambos", pasá la referencia del logo (<id del pedido>-logo.png) a Flow para que lo dibuje igual
+     a la imagen de referencia (en un objeto de la locación, nunca sobre el producto ni tapando una cara). Si la marca no tiene
+     logo cargado, no inventes ninguno y dejá anotado «sin logo cargado» en storyboard.md.
    - SIN LIENZO CUANDO HAY LOCACIONES (Diego, 31-Oct): si plan.json trae "sets_usados" (locaciones con placas), NO generes el
      lienzo: cada cuadro se genera directo en alta (768x1376) con su placa (la que declara "placa"), las 3 fotos del producto,
      las vistas de la hoja de personaje y el bloque PRODUCTO + SCALE LOCK en el prompt. La placa ya fija el lugar y la hoja la

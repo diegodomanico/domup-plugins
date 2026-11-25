@@ -12,6 +12,7 @@ Leé con Read:
 - El guion elegido (pedido.guion_elegido en {{DIR}}/pedido.json) en {{DIR}}/guiones.json y el bloque «Coherencia» de {{DIR}}/storyboard.md
 - Las fotos reales del producto: {{DIR}}/angulos/a1.jpg, a2.jpg, a3.jpg (y si dudás, las de {{DIR}}/fotos/)
 - Los retratos oficiales: {{RETRATOS}}
+- Logo oficial de la marca: {{LOGO}}
 - El historial de fallas: ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/assets/historial-rechazos.md
 
 Compará, una por una:
@@ -34,6 +35,12 @@ Compará, una por una:
    Leé el guion elegido y el bloque «Coherencia» de storyboard.md, y seguí la cuenta cuadro por cuadro: si el guion dice que
    faltan cosas, lo que ya hay se ve en el cuadro del problema; lo que había antes sigue en los cuadros de después; los números
    cierran (personas = lugares; 4 + 6 = 10); lo previo es distinto del producto. Una cuenta que no cierra es BLOQUEANTE.
+7. LOGO DE LA MARCA: verificá {{LOGO}}. Si la marca TIENE logo cargado, al menos un cuadro de plan.json debe mostrarlo en la
+   locación ("logo": "locacion" o "ambos") sobre un objeto lógico (bolsa, caja, taza, cuaderno, cartel chico en la pared), nunca
+   sobre el producto ni tapando una cara, y con el texto «the brand logo from the reference image, printed small and exactly as
+   in the reference; no text, no letters, no captions, no extra logos» en su prompt. Si ningún cuadro de plan.json trae "logo"
+   ("locacion" o "ambos") habiendo logo cargado, es falla BLOQUEANTE (campo: "cuadros"). Si la marca NO tiene logo cargado
+   («sin logo cargado»), NO frenes: solo anotá como «menor» si faltó dejar «sin logo cargado» en storyboard.md.
 
 SEVERIDAD (22-Oct, plan v4: el revisor frenó el plan por el color y la posición de un cohetito del dibujo de la tapa):
 - «bloqueante» = cambia cómo se percibe el producto o el personaje: forma, tamaño, color de una parte GRANDE (cuerpo, tapa,

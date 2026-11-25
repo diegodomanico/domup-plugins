@@ -76,6 +76,15 @@ ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/assets/historial-rechazos.md (las fallas
    la marca y Flow lo animó como un plato que se achica). El logo, el color de la marca y la frase de cierre los pone el montaje
    después, sobre el último cuadro de la historia congelado. Aunque la esencia describa cómo cierra la marca, el cuadro 6 es el
    remate de la historia con los personajes y el producto.
+3g. LOGO DE LA MARCA (Diego, 24-Nov): si el pedido trae "logo": "logo.png" (o existe logo.png en la carpeta, copiado desde el kit
+   de la marca), al menos 1 cuadro muestra el logo REAL de la marca en un objeto de la locación que tenga sentido ahí (bolsa,
+   caja, taza, cuaderno, cartel chico en la pared), nunca sobre el producto y nunca tapando una cara. Ese logo se pasa a Flow
+   como referencia en el paso siguiente (subido con nombre único <pedido>-logo.png). En el prompt de ese cuadro va textual:
+   «the brand logo from the reference image, printed small and exactly as in the reference; no text, no letters, no captions, no extra logos».
+   Ese cuadro lleva "logo": "locacion" en plan.json (o "logo": "ambos" si en ese mismo cuadro un personaje ya lleva el logo
+   bordado en su vestuario). Si un personaje del cuadro tiene el logo bordado en su vestuario, va textual en su vestuario y ese
+   cuadro suma "logo": "ropa" (o "ambos" si también está en la locación). Si el pedido NO tiene logo cargado ("logo": null y
+   no hay logo.png en la carpeta), la regla no frena: se anota en storyboard.md «sin logo cargado» y se avisa en la entrega.
 3e. VESTUARIO FIJO (Diego, 29-Oct, dudas D016/D019: «la misma ropa todo el día… que ya los identifiquen con la ropa, como en
    Veoquiero»). Cada personaje se viste SIEMPRE igual, en todos los cuadros y en todos los clips de la marca. Si el pedido trae
    "vestuario" con su slot, se copia TEXTUAL; si no, lo definís una vez a partir del retrato (lo que el retrato muestra no se
@@ -96,7 +105,7 @@ ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/assets/historial-rechazos.md (las fallas
                               "vestuario": "<en inglés, la ropa COMPLETA: arriba, abajo y calzado. Si el pedido trae vestuario[slot], ESE texto TEXTUAL>"}},
     "lienzo": "<SOLO si no usás sets con placas; con sets_usados va null (31-Oct). Prompt del lienzo con una celda por cuadro del plan (4x2 si son 8; 3x2 en los pedidos viejos de 6), con producto_lock, casa_lock y las frases de escala>",
     "cuadros": [{"n": 1, "prompt": "<prompt en inglés>", "muestra_producto": true|false, "abierto": true|false,
-                 "personajes": ["<slot>"], "cara_tapada": ["<slot que tiene el producto puesto sobre la cara, ej. una máscara; si no, []>"], "sostiene": "<slot o null>", "persona_escala": "<adulta|adulto|nena7|nene7|null>"}]}
+                 "logo": "locacion|ropa|ambos|null", "personajes": ["<slot>"], "cara_tapada": ["<slot que tiene el producto puesto sobre la cara, ej. una máscara; si no, []>"], "sostiene": "<slot o null>", "persona_escala": "<adulta|adulto|nena7|nene7|null>"}]}
    Reglas que la guardia controla (si no las cumplís, el plan vuelve):
    - producto_lock, casa_lock, la apertura (si se ve abierto) y la frase de escala van TEXTUALES dentro de cada prompt.
    - Todo personaje o animal que aparece: su «ref» y sus «rasgos» textuales en el prompt. Los animales también.
@@ -104,7 +113,7 @@ ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/assets/historial-rechazos.md (las fallas
    - Un cuadro con el producto abierto dice «opened exactly as in product photo N» y en el paso de imágenes lleva esa foto
      (apertura_foto) como referencia: un mecanismo no se explica con palabras, se muestra.
    - El contacto con la mano dice «gripping … with real contact»; cada prompt con producto dice «same proportion to the hand as
-     in product photo 1»; sin texto («No text, no letters, no captions»), salvo el nombre impreso que trae el producto real.
+     in product photo 1»; sin texto («No text, no letters, no captions»), salvo el nombre impreso que trae el producto real, ni logos ajenos (el de la marca entra según la regla 3g LOGO DE LA MARCA).
    - PRODUCTO CHICO INSTALADO LEJOS (28-Oct, panel LED de 14,5 cm de Grupo Alterna: en el techo salió de casi un metro y el
      storyboard se frenó a USD 25). Si el producto mide menos de 30 cm y el cuadro lo muestra montado o lejos de las manos
      (en un techo, una pared, un mueble), el prompt nombra un objeto de referencia de tamaño conocido al lado («about the

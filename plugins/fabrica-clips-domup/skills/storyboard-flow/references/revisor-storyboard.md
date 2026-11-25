@@ -25,6 +25,9 @@ El producto real desde 3 ángulos (la verdad):
 Retratos oficiales de los personajes (la verdad):
 {{RETRATOS}}
 
+Logo oficial de la marca (la verdad para comparar):
+{{LOGO}}
+
 Candado de producto (lo escribió otro paso a partir de las fotos; puede tener errores):
 {{PRODUCTO}}
 LAS FOTOS MANDAN. Antes de marcar una falla por una parte del producto (cierres, manijas, cantidad de piezas), mirala en las
@@ -50,7 +53,11 @@ Revisá cuadro por cuadro y después ENTRE cuadros:
    «bloqueante». (25-Oct, luces LED: en el cuadro 4 las barras de 25 cm se veían de unos 40 contra el celular y pasó, porque
    la medición automática solo mide los cuadros con la cara de frente.)
 3. PERSONAJES iguales a su retrato (cara, pelo, ropa, edad). Ningún personaje que no esté en los retratos.
-4. Sin textos, letras, logos inventados ni marcas de agua.
+4. Sin textos, letras ni marcas de agua. El único logo permitido es el de la marca, igual a su referencia ({{LOGO}}): en un objeto
+   de la locación que tenga sentido ahí (nunca sobre el producto ni tapando una cara) y, si el vestuario lo pide, bordado chico
+   en el pecho del avatar. Si hay logo cargado en {{LOGO}}, es falla BLOQUEANTE si ningún cuadro muestra el logo de la marca en
+   la locación, o si el logo aparece deformado, inventado o con letras inventadas. Si {{LOGO}} indica «sin logo cargado», NO
+   frenes por falta de logo y anotalo en "notas" como «sin logo cargado».
 5. (Los cuadros en la cabina roja del confesionario de la marca son correctos: no cuentan como otra casa.) La casa es la misma en todos los cuadros (distintos ambientes de la MISMA casa, como el living y el comedor, están bien;
    otra casa, otra luz o otro estilo, no). El texto impreso que el producto real tiene (por ejemplo su nombre en la tapa)
    está bien si se parece al real; si sale deformado, anotalo en notas, no como falla.
