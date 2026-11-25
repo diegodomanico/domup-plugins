@@ -39,8 +39,11 @@ Guardá todo en una carpeta de trabajo de la sesión (`clip-<item>/`) con un `pe
 
 ## Paso 2 · Los 8 pasos, en orden, con su puerta
 
+> Si el vendedor te pasa un video crudo del producto, arrancá por **`clip-desde-video`** (extrae 5 fotos limpias + `uso.md` + 3 guiones desde el video) y seguí desde el paso 2 (`perfil-completo-avatar`) y paso 3 (`storyboard-flow`).
+
 | # | Habilidad | Qué sale | Puerta (no se avanza con NO APTO) |
 |---|---|---|---|
+| 0 | `clip-desde-video` | (si subís un video crudo) 5 fotos limpias en Flow + `uso.md` + 3 guiones | fotos va/no va + revisor de sentido |
 | 1 | `guion-viral` | 3 guiones de 6 escenas desde virales + preguntas + reseñas; el vendedor elige uno | revisor de sentido |
 | 2 | `perfil-completo-avatar` | baja de `clip_receta` la hoja de 8 vistas hecha por DomUP (`hoja_url_firmada`) y la sube a Flow; solo si falta (`tiene_hoja === false`) la genera | la hoja cumple los 5 criterios |
 | 3 | `storyboard-flow` | 6 cuadros 9:16 en Flow con placas, 3 fotos del producto y hojas | `clip_revisar(paso="storyboard")` |

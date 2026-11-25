@@ -7,6 +7,7 @@ La fábrica de clips de DomUP, la misma que corre para los clientes, en el Claud
 | Habilidad | Qué hace |
 |---|---|
 | `fabrica-clip` | Orquesta los 8 pasos con su puerta. Empezá por acá: «haceme el clip de MLA…» |
+| `clip-desde-video` | Arma un clip híbrido desde un video crudo del producto (extrae 5 fotos limpias en Flow + `uso.md` + 3 guiones y sigue con `storyboard-flow`) |
 | `guion-viral` | Relevamiento de virales (YouTube, TikTok, Meta) + preguntas + reseñas → 3 guiones de 6 escenas |
 | `perfil-completo-avatar` | Hoja de personaje de 8 vistas por avatar |
 | `storyboard-flow` | 6 cuadros 9:16 en Flow con 3 fotos del producto, placas y hojas |

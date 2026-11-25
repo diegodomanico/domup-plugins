@@ -17,7 +17,7 @@ ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/assets/historial-rechazos.md (las fallas
 
 1. PRODUCTO REAL: bajá todas las fotos a fotos/ y mirálas (hoja de contactos). Escribí producto.md (qué es, forma, diseño,
    colores, partes, cómo abre, qué NO tiene). Elegí 3 fotos de 3 ángulos y copialas a angulos/a1.jpg, a2.jpg, a3.jpg. Si pedido.json trae "angulos_guardados": true,
-   angulos/ ya tiene las 3 vistas elegidas en un pedido anterior del mismo producto: usalas y no las vuelvas a elegir (Diego, 30-Oct).
+   angulos/ ya tiene las 3 vistas elegidas en un pedido anterior del mismo producto (o desde tu video): usalas y no las vuelvas a elegir (Diego, 30-Oct). Si trae "angulos_video_parcial": true, conservá los a1.jpg/a2.jpg que ya están en angulos/ (fotos limpias del video) y completá solo las que falten hasta a3.jpg con fotos de item.fotos.
 2. MEDIDAS: corré escala.py con el paquete de la ficha y las personas del guion; guardá la salida en medidas.md.
 3. SEIS CUADROS: si el guion trae menos escenas, la última se parte en dos planos; si trae más, se juntan. Mapeo en storyboard.md.
 3a. LA HISTORIA TIENE QUE CERRAR (27-Oct, sillas de CHAN'S: el guion decía «Son diez y me faltan sillas», pero la mesa del cuadro 1 no tenía ninguna

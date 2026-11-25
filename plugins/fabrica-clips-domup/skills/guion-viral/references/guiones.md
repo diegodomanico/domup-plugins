@@ -13,7 +13,15 @@ PEDIDO (datos del pedido, en JSON):
 {{PEDIDO}}
 
 TAREA
-1. En esta carpeta está virales-crudo.json: el relevamiento ya hecho en 3 fuentes con el método de la casa (TikTok =
+1. SI EL PEDIDO TRAE `"fuente": "video"` (clip desde un video crudo del vendedor):
+   - En esta carpeta ya está `uso.md` (los pasos reales de uso vistos en el video del vendedor) y las fotos limpias del
+     producto en `producto-video/`. NO hace falta `virales-crudo.json` ni `virales.json` (solo usá `virales.json` si ya existe
+     en la carpeta).
+   - Leé `uso.md`, la ficha del producto y `voz_comprador` antes de escribir. Los 3 guiones salen de lo que muestra el video
+     en `uso.md`, usando el elenco y las locaciones de la marca (respetando todas las reglas del punto 2 y los moldes de la casa).
+   - En `guiones.json`, el campo `"viral"` puede ir como `null` (o con los datos del viral si `virales.json` existe).
+   SI NO (`"fuente"` normal de catálogo):
+   En esta carpeta está virales-crudo.json: el relevamiento ya hecho en 3 fuentes con el método de la casa (TikTok =
    «me gusta» en la búsqueda; YouTube = vistas de videos cortos; Meta = anuncios activos con su fecha de inicio: cuanto
    más tiempo al aire, mejor le funciona al anunciante). Elegí entre 6 y 12 referencias que de verdad sean de este tipo de
    producto (descartá las de otro producto), priorizando la métrica más alta de cada fuente. Usá SOLO urls que estén en
