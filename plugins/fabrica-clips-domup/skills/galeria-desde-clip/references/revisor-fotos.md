@@ -27,12 +27,28 @@ LOS CRITERIOS (cada uno puede ser bloqueante)
 3. SE LEE EN EL CELULAR: imaginá cada pieza a 360 px de ancho (la galería en el celular). El titular se lee entero sin hacer
    zoom; el logo de la marca se reconoce y su nombre se lee; las medidas y datos se leen. Si algo queda chico, cortado, tapado o
    sin contraste, bloqueante.
+   EL LOGO NO SE MIDE POR SUS LETRAS (09-Nov): el compositor lo pone en una placa de tamaño FIJO (30 % del ancho), el estándar que
+   Diego aprobó el 01-Nov. Que el nombre de adentro del logo quede chico a 360 px NO es falla (en Veoquiero se marcó en 02 a 12 y
+   frenó carruseles enteros): alcanza con que la placa esté, entera, sin deformar y se reconozca como el logo de la marca. Sí es
+   falla que falte, esté cortado, deformado o pise una cara o el producto.
 4. COMPOSICIÓN: el logo, los íconos, las notas o el texto no tapan una cara ni el producto (el logo puede ir arriba a la izquierda o a la derecha si al centro choca; «logo_choca» en carrusel/_log.json = regenerar); cada flecha termina sobre lo que su nota nombra; los íconos son los del kit de la marca, iguales
    en todas las piezas, y su texto dice algo que se ve o que está en la ficha; el producto no queda cortado por el borde ni tapado por el titular; no hay franjas borrosas, bordes rellenos ni recortes raros. Bloqueante.
 5. REGLAS DE MERCADO LIBRE: la portada (01) sin texto ni logo; en ninguna pieza precios, «envío gratis», «oferta», marcas ajenas,
    contacto o logos de Mercado Libre. Bloqueante.
 7. PRODUCTO (v3c, Diego 31-Oct: el producto siempre, y la emoción con gente sintiendo): portada (01 y 01b) con el producto a
-   menos del 65 % del alto: bloqueante. RAZÓN (impares): el producto es lo más grande y ocupa el 35 % del cuadro o más; si no,
+   menos del 65 % del alto Y a menos del 80 % del ancho: bloqueante.
+   PRODUCTO FINO O ALARGADO (10-Nov, set de estacas solares: 7 piezas marcadas por «ocupa 15 % del cuadro»): una estaca, una
+   varilla, una tira, un cable o un palo nunca llenan el 35 % del ÁREA aunque sean lo principal de la foto. En esos productos
+   medí el LARGO: en RAZÓN alcanza con que el producto (o el conjunto, si es un set) cubra el 45 % del alto o del ancho del
+   cuadro y esté en primer plano; en EMOCIÓN, el 30 %. Escribí en la falla el % del lado, no el del área.
+   CÓMO SE MIDE LA PORTADA (09-Nov: 12 carruseles de Veoquiero frenados por dos reglas que no se podían cumplir juntas). El
+   producto «llena» la portada si llega al 65 % del alto O al 80 % del ancho del cuadro, lo que llegue primero: un producto ancho
+   y bajo (una tartera, un cartel, un set apaisado) no puede llegar al 65 % del alto en un cuadro vertical. Se mide el producto
+   entero, con sus cables y accesorios. En la 01 el producto va EN PRIMER PLANO, cerca de cámara, apoyado, y el avatar DETRÁS:
+   por la perspectiva se ve más grande que en la mano y eso es lo pedido. Por eso en la 01 NO se compara el tamaño del producto
+   contra la cabeza, los hombros o el cuerpo de la persona (el criterio 2 mira ahí forma, color y piezas, no tamaño). Sí es
+   bloqueante en la 01 que la persona lo SOSTENGA en las manos y se vea de otro tamaño que el real: la corrección es apoyarlo
+   adelante, no achicarlo. RAZÓN (impares): el producto es lo más grande y ocupa el 35 % del cuadro o más; si no,
    bloqueante. EMOCIÓN (pares): la persona PUEDE ser más grande; el producto tiene que estar entero o casi, nítido y reconocible,
    en uso, y ocupar el 20 % del cuadro o más; si no, bloqueante. Escribí el % en la falla.
 8. REPETICIÓN (v2): personas en más de 6 piezas, un integrante en más de 3, o dos piezas con la misma persona, la misma ropa y
@@ -54,6 +70,10 @@ LOS CRITERIOS (cada uno puede ser bloqueante)
    sacarlo ni usar la 01b en su lugar (la 01b es de reserva). Si el avatar está mal integrado (recorte pegado, bordes difusos),
    pedí regenerar la 01 con la persona y el producto en la misma foto.
 6. COHERENCIA: el titular dice lo que se ve; las medidas son las de la ficha; el chiste (si hay) se entiende. Si no, menor.
+
+RESPUESTA CORTA (09-Nov: cuatro veredictos se perdieron porque la respuesta era tan larga que se cortó y solo llegó el final).
+Como máximo 10 fallas, primero las bloqueantes; «falla» y «como» de hasta 30 palabras cada una, sin explicar el criterio ni dar
+alternativas para Diego. Lo de la ficha de la publicación no va acá. Una sola respuesta, de una vez.
 
 Respondé SOLO con este JSON, sin nada antes ni después:
 {"apto": true|false,

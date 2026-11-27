@@ -66,3 +66,8 @@ NO hablan (reaccionan sin palabras; lo dice un adulto), nada cae, se suelta ni s
 le dio líneas a Tomás, el nene, y el guion volvió a caer).
 Las frases de "corregir_a" van en la variante de la marca y con modismos de SU país: tuteo de México = «tira», «aguanta»,
 «no manches», nunca «che», «tranqui», «banca» ni voseo rioplatense; voseo = Argentina.
+
+DOBLE LECTURA (Diego, 04-Nov, bloqueante): leé ${CLAUDE_PLUGIN_ROOT}/fabrica/consignas/palabras-por-pais.md.
+Toda frase dicha o escrita en pantalla con una palabra de la lista del país de la publicación, un apodo de la forma del producto
+(«el redondo», «el grande») o cualquier otro doble sentido que un adolescente de ese país encontraría, es falla bloqueante con
+su corregir_a.

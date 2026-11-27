@@ -40,17 +40,29 @@ const cutAt = (t) => C.cuts.some((c) => cur.length && cur[0].s < c && t >= c);
 // Un bloque se muestra entero desde su primera palabra: si la voz hace una pausa adentro, las palabras de después aparecen antes
 // de decirse (29-Oct, duda D008: «y… yo que lo creía» mostró «Y YO» 0,86 s antes del «yo»). Una pausa de más de 0,3 s corta el bloque.
 // Whisper suele tapar la pausa estirando la palabra anterior (ahí la «y» duró 0,99 s): una palabra que dura más que lo que dan sus
-// letras (0,12 s + 0,09 s por letra) también cuenta como pausa. Y ninguna palabra sale más de 0,5 s antes de decirse (regla del revisor final).
+// letras (0,12 s + 0,09 s por letra) también cuenta como pausa.
+// (10-Nov, LeMirk: el tope de 0,5 s desde la primera palabra partía los bloques de a una o dos palabras y se leía entrecortado. Ya no hace
+// falta: cada palabra aparece recién cuando se dice, así que el bloque puede juntar la frase sin adelantar nada.)
 const pausa = (t) => {
   if (!cur.length) return false;
   const p = cur[cur.length - 1];
-  return t - p.e > 0.3 || t - cur[0].s > 0.5 || p.e - p.s > 0.12 + 0.09 * p.t.replace(/[^\p{L}\d]/gu, '').length + 0.3;
+  return t - p.e > 0.3 || p.e - p.s > 0.12 + 0.09 * p.t.replace(/[^\p{L}\d]/gu, '').length + 0.3;
 };
+// 10-Nov (LeMirk, Diego: «textos cortados sin fluidez, van nombrando palabras»): el bloque junta la frase. Solo cortan el cambio de
+// escena, una pausa real de la voz, el punto final o el tamaño (4 palabras o 26 letras; una quinta entra si cierra la frase). La coma
+// ya no corta, y un bloque nunca termina en una palabra suelta de enlace («el», «con», «es»): pasa al bloque siguiente.
+const CON = /^(y|a|o|la|el|en|con|de|que|los|las|un|una|me|se|lo|su|mi|es|del|al|por|para)$/i;
+const soloEnlaces = () => cur.every((x) => CON.test(x.t.replace(/[^\p{L}]/gu, '')));
+const letras = () => cur.reduce((x, y) => x + y.t.length + 1, 0);
 for (const w of words) {
-  if (cur.length && (cur.length >= 4 || cutAt(w.s) || pausa(w.s))) { blocks.push(cur); cur = []; }
+  const cierra = /[.?!]$/.test(w.t);
+  if (cur.length && (cutAt(w.s) || (pausa(w.s) && !soloEnlaces()))) { blocks.push(cur); cur = []; }
+  else if ((cur.length >= 4 && !(cierra && cur.length === 4 && letras() + w.t.length <= 34)) || (cur.length >= 2 && letras() + w.t.length > 26 && !(cierra && letras() + w.t.length <= 34))) {
+    const c = []; while (cur.length > 1 && CON.test(cur[cur.length - 1].t.replace(/[^\p{L}]/gu, ''))) c.unshift(cur.pop());
+    blocks.push(cur); cur = c;
+  }
   cur.push(w);
-  if (/[.?!,:]$/.test(w.t)) { blocks.push(cur); cur = []; }
-  else if (cur.length >= 3 && /^(y|a|la|el|en|con|de|que|los|las)$/i.test(w.t)) { const c = cur.pop(); blocks.push(cur); cur = [c]; }
+  if (cierra) { blocks.push(cur); cur = []; }
 }
 if (cur.length) blocks.push(cur);
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -173,14 +185,20 @@ let fxHtml = '', fxCamHtml = '', fxJs = '';
     fxJs += `tl.fromTo("#${id}",{opacity:0,y:-16},{opacity:1,y:0,duration:0.3,ease:"power3.inOut"},${f.t});` + Array.from({ length: n + 1 }, (_, j) => `tl.set("#${id}d${j}",{opacity:1},${(f.t + j * f.paso).toFixed(3)});` + (j < n ? `tl.set("#${id}d${j}",{opacity:0},${(f.t + (j + 1) * f.paso).toFixed(3)});` : '')).join('') + `tl.to("#${id}",{opacity:0,duration:0.2},${f.t + f.d});`;
   } else if (f.tipo === 'flecha') {
     // rótulo con flecha hacia el centro del cuadro, donde suele estar el producto (30-Oct)
-    const izq = f.x < 300;
+    // 09-Nov: el montaje dice de qué lado quedó el producto (lado) o que no se sabe dónde está (sin_flecha: rótulo solo).
+    const izq = f.lado ? f.lado === 'izq' : f.x < 300;
+    if (f.sin_flecha) {
+      fxHtml += `<div class="fx flecha" id="${id}" style="left:${f.x}px;top:${f.y}px"><div class="ftxt">${f.txt}</div></div>`;
+      fxJs += `tl.fromTo("#${id}",{opacity:0,y:12},{opacity:1,y:0,duration:0.22,ease:"back.out(2)"},${f.t});tl.to("#${id}",{opacity:0,duration:0.2},${f.t + f.d});`;
+    } else {
     fxHtml += `<div class="fx flecha${izq ? '' : ' der'}" id="${id}" style="left:${f.x}px;top:${f.y}px"><div class="ftxt">${f.txt}</div><svg viewBox="0 0 120 60" class="fsvg"><path id="${id}p" d="${izq ? 'M4 30 Q60 4 112 30' : 'M116 30 Q60 4 8 30'}" pathLength="1"/><path class="fpunta" id="${id}h" d="${izq ? 'M98 18 L114 30 L98 42' : 'M22 18 L6 30 L22 42'}"/></svg></div>`;
     fxJs += `tl.fromTo("#${id}",{opacity:0,y:12},{opacity:1,y:0,duration:0.22,ease:"back.out(2)"},${f.t});tl.fromTo("#${id}p",{strokeDashoffset:1},{strokeDashoffset:0,duration:0.35,ease:"power2.out"},${f.t + 0.12});tl.fromTo("#${id}h",{opacity:0},{opacity:1,duration:0.1},${f.t + 0.42});tl.to("#${id}",{opacity:0,duration:0.2},${f.t + f.d});`;
+    }
   } else if (f.tipo === 'palabra') {
     fxHtml += `<div class="fx palabra" id="${id}" style="left:${f.x}px;top:${f.y}px">${f.txt}</div>`;
     fxJs += `tl.fromTo("#${id}",{opacity:0,scale:1.5,rotation:-4},{opacity:1,scale:1,rotation:-2,duration:0.2,ease:"power4.in"},${f.t});tl.fromTo("#cam",{y:0},{y:10,duration:0.05,yoyo:true,repeat:5,ease:"sine.inOut"},${f.t + 0.2});tl.to("#${id}",{opacity:0,scale:0.9,duration:0.2},${f.t + f.d});`;
   } else if (f.tipo === 'barra') {
-    fxHtml += `<div class="fx barra" id="${id}" style="left:${f.x}px;top:${f.y}px"><div class="btxt"><span>${f.txt}</span><b>${f.pct}%</b></div><div class="bt"><div class="bf" id="${id}f"></div></div></div>`;
+    fxHtml += `<div class="fx barra" id="${id}" style="left:${f.x}px;top:${f.y}px"><div class="btxt"><span>${f.txt}</span>${f.pct < 100 ? `<b>${f.pct}%</b>` : ''}</div><div class="bt"><div class="bf" id="${id}f"></div></div></div>`;
     fxJs += `tl.fromTo("#${id}",{opacity:0,x:-30},{opacity:1,x:0,duration:0.25,ease:"power3.out"},${f.t});tl.fromTo("#${id}f",{scaleX:0},{scaleX:${(f.pct / 100).toFixed(2)},duration:1.0,ease:"power2.inOut"},${f.t + 0.2});tl.to("#${id}",{opacity:0,duration:0.2},${f.t + f.d});`;
   } else if (f.tipo === 'versus') {
     fxHtml += `<div class="fx versus" id="${id}" style="left:${f.x}px;top:${f.y}px"><div class="va" id="${id}a">✗ ${f.antes}</div><div class="vd" id="${id}b">✓ ${f.despues}</div></div>`;
@@ -218,7 +236,9 @@ const LOGO_V2 = {
     [0.24, 'inset(60% 0% 5% 0% round 30px)', 10], [0.32, 'inset(20% 0% 20% 0% round 30px)', -5], [0.42, 'inset(0% 0% 0% 0% round 30px)', 0]]
     .map(([t, cp, x]) => `tl.set("#c2logo",{opacity:1,clipPath:"${cp}",x:${x}},${T0} + ${t});`).join('')
     + `tl.fromTo("#c2logo",{scale:1},{scale:1.05,duration:0.1,yoyo:true,repeat:1},${T0} + 0.5);`,
-  cortina: [0, 1, 2].map((i) => `tl.fromTo("#c2b${i}",{xPercent:-105},{xPercent:0,duration:0.32,ease:"power3.in"},${T0} + ${(i * 0.1).toFixed(2)});tl.to("#c2b${i}",{xPercent:105,duration:0.36,ease:"power3.out"},${T0} + ${(0.45 + i * 0.1).toFixed(2)});`).join('')
+  // 05-Nov (batería de VentiMaku): el CSS de .c2bar trae translateX(-105%) y GSAP lo lee como x = -546 px fijo; sumado al xPercent de
+  // la salida (105 %) daba 0: las tres cortinas quedaban tapando el logo hasta el último cuadro en todo clip con «cortina». x va en 0.
+  cortina: [0, 1, 2].map((i) => `tl.fromTo("#c2b${i}",{x:0,xPercent:-105},{x:0,xPercent:0,duration:0.32,ease:"power3.in",immediateRender:false},${T0} + ${(i * 0.1).toFixed(2)});tl.fromTo("#c2b${i}",{x:0,xPercent:0},{x:0,xPercent:105,duration:0.36,ease:"power3.out",immediateRender:false},${T0} + ${(0.45 + i * 0.1).toFixed(2)});`).join('')
     + `tl.set("#c2logo",{opacity:1,scale:0.85},${T0} + 0.5);tl.to("#c2logo",{scale:1,duration:0.5,ease:"back.out(2)"},${T0} + 0.5);` + dotsRadial(`${T0} + 0.9`, 360),
   trazo: `tl.set("#c2trazo",{opacity:1},${T0});tl.fromTo("#c2trazo rect",{strokeDashoffset:1},{strokeDashoffset:0,duration:0.7,ease:"power2.inOut"},${T0});`
     + `tl.fromTo("#c2logo",{opacity:1,clipPath:"circle(0% at 50% 50%)"},{clipPath:"circle(75% at 50% 50%)",duration:0.6,ease:"power3.out"},${T0} + 0.55);`

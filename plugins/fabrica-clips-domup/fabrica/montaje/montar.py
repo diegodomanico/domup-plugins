@@ -14,6 +14,9 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 A = os.environ.get('SHORTS_MTL', os.path.join(AQUI, '..', '..', 'vendor', 'shorts-mtl')) + '/assets'
 AIRE, AIRE_MAX, S0, MIN_ESC, OUTRO = 0.3, 0.8, 0.2, 1.8, 4.1   # aire 0,3 s (23-Oct: con 0,2 la narración sonaba apurada)
 
+def _bin(nombre):
+    return shutil.which(nombre) or (shutil.which(f'{nombre}.cmd') if os.name == 'nt' else None) or nombre
+
 def run(c, **k): subprocess.run(c, check=True, **k)
 def dur(f): return float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f], capture_output=True, text=True).stdout.strip())
 
@@ -74,10 +77,29 @@ def subtitulos(frases):
         if len(ws) == len(plan_t):
             tiempos = [(w['s'], w['e']) for w in ws]
         else:
-            a, b = ws[0]['s'], ws[-1]['e']; tot = sum(len(x) for x in plan_t); acc = 0; tiempos = []
-            for x in plan_t:
-                t0 = a + (b - a) * acc / tot; acc += len(x); tiempos.append((t0, a + (b - a) * acc / tot))
+            # 05-Nov (batería de VentiMaku): repartir por letras entre la primera y la última palabra ignoraba la pausa del medio
+            # («¡Mi celu se muere! … ¿Tienes cargador?») y «¿Tienes» salía 1,68 s antes de decirse. Ahora cada palabra del plan se
+            # ancla a la de whisper que coincide (sin tildes ni signos) y el reparto por letras queda solo entre anclas.
+            import difflib, unicodedata
+            nz = lambda s: re.sub(r'[^a-z0-9ñ]', '', unicodedata.normalize('NFKD', s.lower()).encode('ascii', 'ignore').decode() if s else '')
+            pw = [nz(x) for x in plan_t]; ww = [nz(w.get('t') or w.get('w') or w.get('word') or w.get('text') or '') for w in ws]   # 12-Nov: la palabra viene en «t»; sin eso no anclaba nunca (D008 repetido con números)
+            anc = {}
+            for blk in difflib.SequenceMatcher(None, pw, ww, autojunk=False).get_matching_blocks():
+                for k in range(blk.size): anc[blk.a + k] = (ws[blk.b + k]['s'], ws[blk.b + k]['e'])
+            anc.setdefault(0, (ws[0]['s'], ws[0]['s'] + 0.2)); anc.setdefault(len(plan_t) - 1, (max(ws[-1]['e'] - 0.2, ws[0]['s']), ws[-1]['e']))
+            tiempos = [None] * len(plan_t); idx = sorted(anc)
+            for i in idx: tiempos[i] = anc[i]
+            for i0, i1 in zip(idx, idx[1:]):
+                if i1 - i0 < 2: continue
+                a, b = anc[i0][1], anc[i1][0]; seg = plan_t[i0 + 1:i1]; tot = sum(len(x) for x in seg) or 1; acc = 0
+                for j, x in enumerate(seg, start=i0 + 1):
+                    t0 = a + (b - a) * acc / tot; acc += len(x); tiempos[j] = (t0, a + (b - a) * acc / tot)
         for (t0, t1), tx in zip(tiempos, plan_t):
+            # 05-Nov (rack de VentiMaku): whisper pega la pausa a la palabra siguiente («¿Quién» de 13,86 a 14,86 s, dicha a las
+            # 14,38): el subtítulo salía al empezar el silencio, 0,53 s antes. Una palabra que dura mucho más de lo que tarda en
+            # decirse (~0,09 s por letra + 0,2) arranca donde de verdad se dice: al final de su tramo menos esa duración.
+            letras = len(re.sub(r'[^\wáéíóúüñ]', '', tx, flags=re.I)); plaus = 0.09 * letras + 0.2
+            if t1 - t0 > plaus + 0.3: t0 = t1 - plaus
             out.append({'t': tx, 's': round(f['t'] + t0, 3), 'e': round(f['t'] + t1, 3)})
         if out and out[-1]['t'][-1] not in '.,!?': out[-1]['t'] += ','
     for i in range(1, len(out)):
@@ -163,7 +185,11 @@ def marca_en_html(html, esencia, destino):
             print(f'letra de la esencia: {fam}')
         except Exception as e:
             print(f'letra de la esencia «{fam}» no se pudo bajar ({e}); queda Montserrat')
-    if (esencia or {}).get('variante_idioma') == 'tuteo':   # botones del cierre en tú (VentiMaku: «Voseo: siempre tuteo»)
+    # 10-Nov (panel LED de Grupo Alterna, México, variante «neutro»): los botones salían en voseo («COMPRALO», «MIRÁ MÁS») porque solo
+    # se pasaban a tú con la variante «tuteo». El voseo es solo para la variante «voseo»; toda otra variante, y todo país que no
+    # sin variante cargada, quedan como están.
+    _var = str((esencia or {}).get('variante_idioma') or '').lower()
+    if _var and _var != 'voseo':   # botones del cierre en tú (VentiMaku: «Voseo: siempre tuteo»; Grupo Alterna: «neutro»)
         for a, b in [('COMPRALO', 'CÓMPRALO'), ('MIRÁ MÁS', 'MIRA MÁS'), ('ENCONTRALO', 'ENCUÉNTRALO'), ('PEDILO', 'PÍDELO'),
                      ('Compralo', 'Cómpralo'), ('Mirá más', 'Mira más')]:
             h = h.replace(a, b)
@@ -190,12 +216,66 @@ def fondo_logo(motion, acento, contraste):
     open(html, 'w', encoding='utf8').write(h)
     print(f'logo claro ({round(100 * oscuros)}% de trazo oscuro): tarjetas del logo en {fondo}')
 
+def recortar_blanco(src, dst):
+    """Saca el fondo blanco propio de un logo (Veoquiero: PNG opaco con fondo blanco). Se va el blanco que toca el borde y los
+    huecos chicos de las letras; el blanco grande encerrado por el dibujo (el ojo de Veoquiero) queda. Los bordes se pasan a
+    transparencia proporcional para que no quede un filo blanco. Si el logo ya es transparente, no se toca."""
+    import cv2, numpy as np
+    from PIL import Image
+    im = np.array(Image.open(src).convert('RGBA')).astype(np.float32)
+    if (im[..., 3] < 128).mean() > 0.05: return False
+    rgb = im[..., :3]; claro = (rgb.min(axis=2) >= 232).astype(np.uint8)
+    n, lab, st, _ = cv2.connectedComponentsWithStats(claro, connectivity=4)
+    H, W = claro.shape; fuera = np.zeros((H, W), np.uint8)
+    for i in range(1, n):
+        x, y, w, h, area = st[i]
+        toca = x == 0 or y == 0 or x + w >= W or y + h >= H
+        if toca or area < 0.004 * H * W: fuera[lab == i] = 1
+    if fuera.mean() < 0.05: return False
+    zona = cv2.dilate(fuera, np.ones((5, 5), np.uint8)) > 0
+    a = 1.0 - rgb.min(axis=2) / 255.0                      # blanco → 0, color pleno → ~1
+    a = np.clip(a * 1.6, 0, 1)                             # el antialias no deja el color lavado
+    aa = np.where(zona, a, 1.0); aa[fuera > 0] = np.minimum(aa[fuera > 0], 0.0)
+    seg = np.maximum(aa, 1e-3)[..., None]
+    col = np.where(zona[..., None], np.clip((rgb - (1 - seg) * 255.0) / seg, 0, 255), rgb)
+    out = np.dstack([col, aa * 255.0]).astype(np.uint8)
+    Image.fromarray(out, 'RGBA').save(dst)
+    print(f'logo recortado: {os.path.basename(dst)} ({round(100 * fuera.mean())}% de fondo blanco afuera)')
+    return True
+
+def logo_sin_tarjeta(motion):
+    """El logo sin su tarjeta (12-Nov, Veoquiero: «que el logo no tenga ese banner blanco»). Se saca el rectángulo y el logo queda
+    recortado sobre la imagen, con un contorno claro pegado a su forma (como un sticker) para que se lea sobre cualquier fondo."""
+    html = f'{motion}/index.html'
+    if not os.path.exists(html): return
+    for n in ('logo-sq-abierto.png', 'logo-sq-cerrado.png', 'logo-hd.png'):
+        if os.path.exists(f'{motion}/{n}'): recortar_blanco(f'{motion}/{n}', f'{motion}/{n}')
+    borde = 'drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 3px #fff) drop-shadow(0 0 5px rgba(255,255,255,.9)) drop-shadow(0 4px 10px rgba(0,0,0,.4))'
+    css = ('<style>#c2logo, #logo { background: transparent !important; box-shadow: none !important; overflow: visible !important; }'
+           f' #c2logo img, #logo img {{ filter: {borde}; }} #c2logo .shine {{ display: none !important; }}</style>')
+    h = open(html, encoding='utf8').read()
+    h = h.replace('</head>', css + '</head>', 1) if '</head>' in h else css + h
+    open(html, 'w', encoding='utf8').write(h)
+    print('logo sin tarjeta: recortado con contorno claro')
+
 def main(d):
     plan = json.load(open(f'{d}/anim-plan.json', encoding='utf8'))
+    # 11-Nov: el revisor final marcó un rótulo, una placa o una gráfica tapando algo en una escena (5 clips frenados con todas las
+    # escenas ya animadas). El worker anota esas escenas en montaje-omitir.json y vuelve a montar: ahí no va ninguna gráfica.
+    if os.path.exists(f'{d}/montaje-omitir.json'):
+        _om = set(json.load(open(f'{d}/montaje-omitir.json', encoding='utf8')).get('escenas', []))
+        for _k in ('chips', 'placas', 'efectos'):
+            plan[_k] = [x for x in plan.get(_k, []) if x.get('escena') not in _om]
+        print(f'gráficas omitidas en las escenas {sorted(_om)} (las marcó el revisor final)')
     frases = json.load(open(f'{d}/voz/manifest.json', encoding='utf8'))
     pedido = json.load(open(f'{d}/pedido.json', encoding='utf8'))
     # La identidad la elige el worker (lib/marca-auto.mjs): hecha a mano en marcas/ o armada sola con el logo y la esencia.
     marca = json.load(open(os.environ.get('MARCA_JSON') or f'{AQUI}/../marcas/{pedido["cust_id"]}.json', encoding='utf8'))
+    # Opciones de montaje de ESTE pedido (12-Nov): las escribe el carril cuando el vendedor pide un ajuste que no toca las escenas
+    # (lib/cola.mjs, esAjusteDeMontaje): otra música o el logo sin su tarjeta blanca.
+    _op = json.load(open(f'{d}/montaje-opciones.json', encoding='utf8')) if os.path.exists(f'{d}/montaje-opciones.json') else {}
+    if _op.get('musica') and os.path.exists(_op['musica']): marca['musica'] = _op['musica']; print('música del pedido (ajuste):', _op['musica'])
+    if _op.get('logo_sin_tarjeta'): marca['logo_sin_tarjeta'] = True
     elenco = {e['slot']: e for e in pedido['elenco']}
     D = f'{d}/montaje'; E = f'{D}/edicion'
     OUT = f'{d}/entrega/{pedido["item"]["id"]}-{pedido["id"]}.mp4'
@@ -208,7 +288,24 @@ def main(d):
     # voz no entraba).
     tramos = {e['n']: tuple(e['usable']) for e in json.load(open(p2, encoding='utf8')).get('escenas', [])
               if e.get('usable') and any(f.get('severidad') != 'menor' for f in e.get('fallas') or [])} if os.path.exists(p2) else {}
-    esc = linea_de_tiempo(plan, frases, dv, tramos)
+    # 05-Nov (bolso de Racer, escena 4): Flow dijo otra frase, se reemplazó por texto a voz y la nueva duraba 3,73 s contra 3,35 s de
+    # video: el montaje frenaba el clip ya animado por 0,38 s. Si la voz se pasa hasta un 22 % (las tomas de texto a voz cambian de largo en cada vuelta: 13 % y 18 % en el mismo clip), se acelera esa escena (atempo) en vez
+    # de congelar la imagen o volver a animar; más que eso sigue frenando.
+    for _ in range(3):
+        try:
+            esc = linea_de_tiempo(plan, frases, dv, tramos); break
+        except SystemExit as ex:
+            mm = re.search(r'escena (\d+): la voz dura ([\d.]+) s y el video usable ([\d.]+) s', str(ex))
+            if not mm: raise
+            n_e, voz_d, vid_d = int(mm.group(1)), float(mm.group(2)), float(mm.group(3))
+            r = voz_d / max(0.1, vid_d - 0.05)
+            fr_e = [f for f in frases if f['escena'] == n_e]
+            if r > 1.22 or not fr_e or any(f.get("tempo") for f in fr_e): raise
+            for f in fr_e:
+                f['tempo'] = round(r, 3); f['dur'] = round(f['dur'] / r, 3)
+                f['palabras'] = [{**w, 's': w['s'] / r, 'e': w['e'] / r} for w in (f.get('palabras') or [])] or f.get('palabras')
+                if f.get('inicio_en_escena') is not None: pass
+            print(f'escena {n_e}: la voz se pasaba {voz_d - vid_d:.2f} s; va acelerada {r:.2f}x para que entre sin congelar la imagen')
     # Sincronía de labios (25-Oct, micrófono: la voz del confesionario quedó corrida): cada frase a cámara tiene que caer en
     # el mismo segundo del video de Flow en que el personaje habla. Si se corre más de 0,1 s, el clip no sale.
     for f in frases:
@@ -222,6 +319,20 @@ def main(d):
                 e['hold'] = round(corr, 3); corr = 0
             if abs(corr) > 0.1:
                 raise SystemExit(f'✗ escena {e["n"]}: la voz a cámara queda corrida {corr:+.2f} s de los labios')
+    # Silencio antes de una frase a cámara (12-Nov, tubos led de Grupo Alterna: «Y por eso traje veinte.» en off y 0,95 s de
+    # silencio hasta que Iván habla a cámara; el control frena con más de 0,8 s). La frase a cámara no se puede mover (va con los
+    # labios), pero la frase en off sí: se corre hacia adelante para repartir el silencio, sin dejar más de 0,75 s antes ni después.
+    _fe = [f for f in frases if f['escena'] != 'cierre']
+    for _i in range(len(_fe) - 1):
+        _f, _sig = _fe[_i], _fe[_i + 1]
+        if _f.get('modo') != 'off' or _sig.get('modo') != 'camara' or _f['escena'] != _sig['escena']: continue
+        _desp = _sig['t'] - (_f['t'] + _f['dur'])
+        if _desp <= 0.8: continue
+        _antes = (_f['t'] - (_fe[_i - 1]['t'] + _fe[_i - 1]['dur'])) if _i else 0.35
+        _d = round(min(_desp - 0.35, 0.75 - _antes), 3)
+        if _d > 0.02:
+            _f['t'] = round(_f['t'] + _d, 3)
+            print(f'escena {_f["escena"]}: la frase en off se corre {_d:.2f} s para no dejar {_desp:.2f} s de silencio antes de la frase a cámara')
     REEL = esc[-1]['fin']
     # El cierre dura lo que dura su frase (30-Oct, Herramental Babilonia: la frase de 4,8 s en un cierre fijo de 4,1 s cortaba la
     # voz en «Mirá la…» y el título quedaba a medias). Mínimo 4,1 s; si la frase es más larga, el cierre se estira y deja 0,7 s de aire.
@@ -235,10 +346,25 @@ def main(d):
               open(f'{D}/linea.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)
     # 1. pista de voz (solo ElevenLabs)
     ins, fc = [], []
+    # 05-Nov (VentiMaku, 3 de 5 cambios de Julio: «la voz del hombre está muy baja», «las voces del hijo y la mamá no se escuchan»):
+    # cada frase entraba con su nivel original (la voz de Flow con labios y la de ElevenLabs salen a niveles distintos) y después se
+    # normalizaba la pista entera, así que las frases bajas seguían bajas al lado de las otras. Ahora cada frase se lleva al mismo
+    # nivel (-20 LUFS medido en su tramo con voz) antes de mezclar; el tope de ganancia evita levantar ruido de una toma casi muda.
+    def nivel_tramo(archivo, ini, fin):
+        st = subprocess.run(['ffmpeg', '-ss', f'{ini:.3f}', '-t', f'{max(0.4, fin - ini):.3f}', '-i', archivo, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
+        m = re.findall(r'I:\s+(-?[\d.]+) LUFS', st)
+        return float(m[-1]) if m and float(m[-1]) > -70 else None
     for i, f in enumerate(frases):
         ins += ['-i', f'{d}/{f["archivo"]}']
-        ini = f.get('voz_ini', 0); fin = ini + f['dur']   # tramo con voz medido en voces.mjs: se recorta acá, el archivo queda intacto
-        fc.append(f'[{i}:a]atrim={ini}:{fin},asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,afade=t=in:d=0.015,afade=t=out:st={max(0, f["dur"] - 0.05):.3f}:d=0.05,adelay={int(f["t"] * 1000)}:all=1[v{i}]')
+        tp = f.get('tempo') or 1.0   # escena acelerada para no congelar la imagen (ver arriba): el tramo original es dur × tempo
+        ini = f.get('voz_ini', 0); fin = ini + f['dur'] * tp   # tramo con voz medido en voces.mjs: se recorta acá, el archivo queda intacto
+        lv = nivel_tramo(f'{d}/{f["archivo"]}', ini, fin)
+        g = max(-12.0, min(12.0, -20 - lv)) if lv is not None else 0.0
+        f['nivel_lufs'] = lv
+        at = f'atempo={tp:.3f},' if tp != 1.0 else ''
+        fc.append(f'[{i}:a]atrim={ini}:{fin},asetpts=PTS-STARTPTS,{at}aresample=48000,aformat=channel_layouts=stereo,volume={g:.2f}dB,afade=t=in:d=0.015,afade=t=out:st={max(0, f["dur"] - 0.05):.3f}:d=0.05,adelay={int(f["t"] * 1000)}:all=1[v{i}]')
+    nv = [f.get('nivel_lufs') for f in frases if f.get('nivel_lufs') is not None]
+    if nv: print(f'voces: niveles de entrada {min(nv):.1f} a {max(nv):.1f} LUFS, todas llevadas a -20')
     fc.append(''.join(f'[v{i}]' for i in range(len(frases))) + f'amix=inputs={len(frases)}:normalize=0,apad=whole_dur={total}[o]')
     run(['ffmpeg', '-y', '-loglevel', 'error', *ins, '-filter_complex', ';'.join(fc), '-map', '[o]', '-t', str(total), f'{D}/voz.wav'])
     # Nivel de la voz (27-Oct, sillas de CHAN'S: la voz de esa marca salió de ElevenLabs a -37 LUFS contra -25 de las de Veoquiero;
@@ -284,8 +410,57 @@ def main(d):
             print(f'escena {e["n"]}: primer plano, subtítulos en la franja que menos tapa ({top})')
         subs_top.append(top)
     con_chip = {c['escena'] for c in plan.get('chips', [])}
-    medio_n = next((n for n in (4, 3, 5, 2) if n in ini and n not in con_chip), 4)
+    # 18-Nov (espejo de 60 cm de VentiMaku 6bd6d69d): en la escena 4 las caras ocupaban todas las franjas bajas, el subtítulo quedó
+    # arriba (200) y el logo, que va en esa escena, quedó pisado por «PIERDES»; el revisor final frenó el clip terminado. El logo va
+    # primero a una escena cuyo subtítulo no toca su lugar; si ninguna, la regla de antes.
+    _orden_n = [e['n'] for e in esc]
+    _libre = lambda n: not choca((40, subs_top[_orden_n.index(n)] - 10, 680, subs_top[_orden_n.index(n)] + 125), [LOGO_CAJA])
+    medio_n = next((n for n in (4, 3, 5, 2, 6) if n in ini and n in _orden_n and n not in con_chip and _libre(n)), None) \
+        or next((n for n in (4, 3, 5, 2) if n in ini and n not in con_chip), 4)
     medio = ini[medio_n]; logo_t = [round(medio['ini'] + 0.1, 2), round(medio['fin'] - 0.1, 2)]
+    # Dónde está el producto al empezar cada escena (09-Nov, cámara domo de VentiMaku 7714cd89: el rótulo «CÁMARA DOMO WI-FI» cayó
+    # justo encima de la cámara y su flecha apuntaba a los brazos de Héctor; el revisor final frenó el clip). El storyboard ya lo
+    # midió: manifest[n].medida.caja, en píxeles del panel. Se pasa a 720x1280. Sin medida, no se sabe y la flecha no se dibuja.
+    prod_caja = {}
+    try:
+        import cv2 as _cv
+        for i, m in enumerate(json.load(open(f'{d}/paneles/manifest.json', encoding='utf8'))):
+            cj = (m.get('medida') or {}).get('caja')
+            if not cj or len(cj) != 4: continue
+            im = _cv.imread(f'{d}/{m["archivo"]}')
+            if im is None: continue
+            sx, sy = 720 / im.shape[1], 1280 / im.shape[0]
+            prod_caja[i + 1] = (round(cj[0] * sx), round(cj[1] * sy), round(cj[2] * sx), round(cj[3] * sy))
+    except Exception as ex:
+        print(f'caja del producto: no se pudo leer ({ex})')
+    # La caja medida sobre la escena YA ANIMADA manda sobre la del cuadro del storyboard (10-Nov, lib/ubicar-producto.mjs): es donde
+    # el producto está de verdad en el video. Si la caja ocupa más de la mitad del cuadro no sirve para esquivar y no se usa.
+    try:
+        for k, cj in (json.load(open(f'{d}/montaje-cajas.json', encoding='utf8')).get('cajas') or {}).items():
+            if (cj[2] - cj[0]) * (cj[3] - cj[1]) <= 0.5 * 720 * 1280: prod_caja[int(k)] = tuple(cj)
+            else: prod_caja.pop(int(k), None)
+    except Exception:
+        pass
+    # 11-Nov (lámpara de Grupo Alterna b225e040: «INGENIERA PAULINA» y «PRUEBA DE VAPOR» escritos encima de la lámpara que sostiene
+    # Paulina; el revisor final frenó el clip): la franja de subtítulos esquivaba las caras pero no el producto. Con el producto
+    # ubicado en la escena, se busca una franja libre de caras Y de producto; si no hay ninguna, queda la que esquiva las caras.
+    for _i, e in enumerate(esc):
+        _pc = prod_caja.get(e['n'])
+        if not _pc or not choca((40, subs_top[_i] - 10, 680, subs_top[_i] + 125), [_pc]): continue
+        _alt = next((t for t in (740, 660, 300, 200, 560) if not choca((40, t - 10, 680, t + 125), list(caras[e['n']]) + [_pc])), None)
+        if _alt is not None:
+            print(f'escena {e["n"]}: subtítulos de {subs_top[_i]} a {_alt} para no escribir sobre el producto'); subs_top[_i] = _alt
+    # 14-Nov (Cari Amici de TecnoTienda 1acb4653: «ASADA» escrito encima del logo de la tienda; el revisor final frenó el clip): la
+    # franja de arriba (200) llega hasta y=325 y el logo ocupa hasta y=234. En las escenas donde se ve el logo, el subtítulo no va
+    # en una franja que lo pise: se busca otra libre de caras, del logo y del producto; si no hay, libre de caras y del logo.
+    for _i, e in enumerate(esc):
+        if e['fin'] < logo_t[0] or e['ini'] > logo_t[1]: continue
+        if not choca((40, subs_top[_i] - 10, 680, subs_top[_i] + 125), [LOGO_CAJA]): continue
+        _pc = prod_caja.get(e['n']); _base = list(caras[e['n']]) + [LOGO_CAJA]
+        _alt = next((t for t in (740, 660, 300, 560) if not choca((40, t - 10, 680, t + 125), _base + ([_pc] if _pc else []))), None)
+        if _alt is None: _alt = next((t for t in (740, 660, 300, 560) if not choca((40, t - 10, 680, t + 125), _base)), None)
+        if _alt is not None:
+            print(f'escena {e["n"]}: subtítulos de {subs_top[_i]} a {_alt} para no escribir sobre el logo'); subs_top[_i] = _alt
     chips = []
     for c in plan.get('chips', [])[:7]:
         e = ini[c['escena']]; alto = 170 if c.get('big') else 64; ancho = 600 if c.get('big') else min(640, 40 + 22 * len(c['txt']))
@@ -300,8 +475,38 @@ def main(d):
             caras_c = caras[c['escena']]
         prohibido = caras_c + ([LOGO_CAJA] if con_logo else []) + [(0, sub - 10, 720, sub + 125)]
         # El chip se dibuja centrado y con su tamaño fijo (build-vq usa solo top): por eso se prueban alturas, no costados.
-        top = next((t for t in (150, 100, 250, 560, 480, 400, 330, 600, 760, 680, 40, 820) if not choca((x1, t, x1 + ancho, t + alto), prohibido)), None)
-        if top is None: raise SystemExit(f'✗ escena {c["escena"]}: el chip «{c["txt"]}» no entra sin tapar una cara, el logo o los subtítulos')
+        pc_c = prod_caja.get(c['escena'])
+        # Con los subtítulos arriba (sub < 400) la mitad de abajo está libre: el rótulo puede bajar hasta y=1010 (10-Nov, asiento Viper:
+        # el gancho tapaba el asiento habiendo lugar más abajo, porque el tope de 860 era el de los subtítulos abajo).
+        lim_c = (1011 if sub < 400 else 861) - alto
+        top = next((t for t in (150, 100, 250, 560, 480, 400, 330, 600, 760, 680, 40, 820) if not choca((x1, t, x1 + ancho, t + alto), prohibido + [pc_c])), None) if pc_c else None
+        # 10-Nov (asiento Viper de Racer): sin saber dónde está el producto, el rótulo del gancho cayó a la altura del pecho y tapó el
+        # asiento que Fede sostenía. El gancho, que es grande, prueba primero arriba y bien abajo; el medio del cuadro (donde se
+        # sostiene el producto) queda para lo último.
+        orden = (150, 100, 40, 250, 760, 680, 820, 600, 330, 400, 480, 560) if c.get('big') and not pc_c else (150, 100, 250, 560, 480, 400, 330, 600, 760, 680, 40, 820)
+        if top is None and pc_c:
+            # Sin franja libre de caras Y de producto (10-Nov, asiento Viper de Racer, 2.ª vez): entre las alturas libres de caras,
+            # logo y subtítulos, va la que MENOS producto tapa, no la primera de la lista.
+            libres_c = [t for t in range(40, lim_c, 10) if not choca((x1, t, x1 + ancho, t + alto), prohibido)]
+            if libres_c:
+                # con 28 px de aire alrededor del producto: pegado al borde, el revisor lo lee como tapado (asiento Viper, 3.ª vez)
+                tapa_p = lambda t: max(0, min(x1 + ancho, pc_c[2] + 28) - max(x1, pc_c[0] - 28)) * max(0, min(t + alto, pc_c[3] + 28) - max(t, pc_c[1] - 28))
+                top = min(libres_c, key=tapa_p)
+        if top is None: top = next((t for t in orden if not choca((x1, t, x1 + ancho, t + alto), prohibido)), None)
+        # 09-Nov (asiento Viper de Racer, 6cbca174: «ANTES DE INSTALAR» no entraba en las 12 alturas fijas y el clip entero quedó
+        # frenado, con las 8 escenas ya animadas). Primero se busca cada 10 px; si aun así no entra, un rótulo chico se omite con
+        # aviso (el clip sale igual) y el del gancho, que tiene que estar, va donde menos cara tapa sin pisar el logo ni los subtítulos.
+        if top is None:
+            top = next((t for t in range(40, lim_c, 10) if not choca((x1, t, x1 + ancho, t + alto), prohibido)), None)
+        if top is None and not c.get('big'):
+            print(f'rótulo «{c["txt"]}» de la escena {c["escena"]}: omitido, no entra sin tapar una cara, el logo o los subtítulos'); continue
+        if top is None:
+            fijo = ([LOGO_CAJA] if con_logo else []) + [(0, sub - 10, 720, sub + 125)]
+            def pisa(t): return sum(max(0, min(x1 + ancho, b) - max(x1, a)) * max(0, min(t + alto, d2) - max(t, c0)) for a, c0, b, d2 in caras_c)
+            libres = [t for t in range(40, lim_c, 10) if not choca((x1, t, x1 + ancho, t + alto), fijo)]
+            if not libres: raise SystemExit(f'✗ escena {c["escena"]}: el chip «{c["txt"]}» no entra sin tapar una cara, el logo o los subtítulos')
+            top = min(libres, key=pisa)
+            print(f'rótulo del gancho «{c["txt"]}»: no hay franja libre de caras; va en top={top}, donde menos tapa')
         # Los rótulos chicos duran 1,6 s (alcanzan para 2-4 palabras) y liberan el lugar para la segunda gráfica (30-Oct).
         chips.append({'escena': c['escena'], 't': round(e['ini'] + 0.1, 2), 'd': round(min(2.7 if c.get('big') else 1.6, e['fin'] - e['ini'] - 0.2), 2), 'txt': c['txt'], 'top': top, 'alto': alto, 'x1': round(x1), 'ancho': round(ancho), **({'big': True} if c.get('big') else {})})
     fx = []
@@ -324,7 +529,9 @@ def main(d):
         y = next((y for y in alturas if not choca((x, y, x + 280, y + 115), prohibido + [LOGO_CAJA])), None)
         if y is None and cuadro.get('muestra_producto'):
             print(f'placa de {p["personaje"]} en la escena {p["escena"]}: omitida para no tapar el producto'); continue
-        if y is None: raise SystemExit(f'✗ escena {p["escena"]}: la placa de {p["personaje"]} no entra sin tapar una cara o un rótulo')
+        # 05-Nov (batería de VentiMaku): en un primer plano la placa no entraba y el montaje frenaba el clip entero tres vueltas
+        # seguidas, por un adorno. Como con el producto a la vista: se omite y se avisa; nunca tapa una cara.
+        if y is None: print(f'placa de {p["personaje"]} en la escena {p["escena"]}: omitida, no entra sin tapar una cara o un rótulo'); continue
         fx.append({'tipo': 'personaje', 't': round(e['ini'] + 0.2, 2), 'd': round(min(1.9, e['fin'] - e['ini'] - 0.35), 2), 'x': x, 'y': y,
                    'px': 360, 'py': 300, 'nombre': elenco[p['personaje']]['nombre'].upper(), 'rol': ''})
     # Efectos de misión, uno por escena (Diego, 29-Oct: «mínimo 6 efectos, 1 por escena»). Cada uno va donde no tapa caras,
@@ -342,15 +549,31 @@ def main(d):
     for ef in plan.get('efectos', []):
         e = ini.get(ef.get('escena'))
         if not e: continue
-        t = round(min(e['fin'] - 0.6, e['ini'] + max(0.1, float(ef.get('en') or 0.3))), 2); dur_ef = round(max(0.8, min(2.4, e['fin'] - t - 0.15)), 2)
+        # 05-Nov (cámara exterior de VentiMaku): con t hasta fin-0,6 y la duración mínima de 0,8 s, una gráfica de fin de escena
+        # seguía en pantalla 0,2 s después del corte, sobre la escena siguiente, cuyas caras no se habían medido: «PASO 1» cayó en
+        # la frente de Valentina. Ahora arranca a más tardar 0,95 s antes del corte, así termina dentro de su escena.
+        t = round(max(e['ini'] + 0.05, min(e['fin'] - 0.95, e['ini'] + max(0.1, float(ef.get('en') or 0.3)))), 2)
+        dur_ef = round(max(0.8, min(2.4, e['fin'] - t - 0.15)), 2)
+        dur_ef = round(min(dur_ef, max(0.5, e['fin'] - t - 0.05)), 2)   # nunca cruza el corte, aunque la escena sea muy corta
         # Con 2 o 3 gráficas por escena, cada una termina cuando arranca la siguiente de esa escena (así pueden compartir lugar).
-        sig = [round(min(e['fin'] - 0.6, e['ini'] + max(0.1, float(o.get('en') or 0.3))), 2) for o in plan.get('efectos', [])
+        sig = [round(max(e['ini'] + 0.05, min(e['fin'] - 0.95, e['ini'] + max(0.1, float(o.get('en') or 0.3)))), 2) for o in plan.get('efectos', [])
                if o is not ef and o.get('escena') == ef.get('escena') and o.get('tipo') not in ('punch', 'sacudida')]
         sig = [x for x in sig if x > t + 0.5]
         if sig: dur_ef = round(max(0.7, min(dur_ef, min(sig) - t - 0.1)), 2)
         tipo = ef.get('tipo')
         if tipo == 'punch': fx.append({'tipo': 'punch', 't': t, 'd': 0.6, 's': 1.15, 'ox': 50, 'oy': 45}); continue
-        if tipo == 'sacudida': fx.append({'tipo': 'sacudida', 't': t, 'x': 360, 'y': 640, 'r': 150}); continue
+        if tipo == 'sacudida':
+            # 10-Nov (espejo redondo de Lemirk ec54958b): las líneas de vibración iban siempre al centro del cuadro y cruzaron los ojos
+            # de dos caras en primer plano. Van donde no hay caras; si no hay lugar, no van.
+            r_s = 150
+            try: caras_s = caras_en(f'{d}/anim/e{ef["escena"]}.mp4', e['s0'] + max(0.0, t - e['ini'] - 0.1) * e['vel'], e['s0'] + (t - e['ini'] + 0.7) * e['vel'], solo)
+            except Exception: caras_s = caras[ef['escena']]
+            # las líneas se dibujan a los DOS costados (de r+14 a r+46 px del centro, 80 px de alto): se miran esas dos franjas
+            franjas = lambda x, y: [(x - r_s - 50, y - 45, x - r_s - 10, y + 45), (x + r_s + 10, y - 45, x + r_s + 50, y + 45)]
+            lugar = next(((x, y) for x, y in ((360, 640), (360, 480), (360, 780), (360, 330), (360, 900)) if not any(choca(fr, caras_s) for fr in franjas(x, y))), None)
+            if lugar: fx.append({'tipo': 'sacudida', 't': t, 'x': lugar[0], 'y': lugar[1], 'r': r_s})
+            else: print(f'efecto sacudida de la escena {ef["escena"]}: omitido, las caras ocupan el cuadro')
+            continue
         if tipo not in TAM: continue
         w, h = TAM[tipo]
         # El sello es nowrap a 64 px (~42 px por letra + borde y relleno) y va girado: con el ancho fijo de 420, «¡CONECTADO!»
@@ -378,27 +601,54 @@ def main(d):
         ys = list(pref) + [y for y in range(96, 880 - h + 1, 10) if y not in pref]
         xs = list(dict.fromkeys([round(360 - w / 2), 40, 680 - w] + list(range(40, 680 - w + 1, 40))))
         pos = [(x, y) for y in ys for x in xs]
-        xy = next(((x, y) for x, y in pos if y + h <= 880 and not choca((x, y, x + w, y + h), prohibido)), None)
+        # Flecha: el rótulo va AL LADO del producto, a su altura, con la punta hacia él. Ancho real: ~21 px por letra + relleno +
+        # la flecha de 126 px (con los 420 fijos, un texto de 17 letras medía 520 y la punta se salía de lo reservado).
+        pc = prod_caja.get(ef['escena'])
+        lado = None; xy = None; k = 1
+        if tipo == 'flecha':
+            w = max(300, len(ef.get('txt') or '') * 21 + 38 + 126)
+            if pc:
+                cy = (pc[1] + pc[3]) / 2
+                for kk in (1, 0.75, 0.6):
+                    wk, hk = round(w * kk), round(h * kk)
+                    yk = round(min(880 - hk, max(96, cy - hk / 2)))
+                    for ld, xk in (('izq', pc[0] - wk - 4), ('der', pc[2] + 4)):
+                        if xk >= 8 and xk + wk <= 712 and not choca((xk, yk, xk + wk, yk + hk), prohibido):
+                            xy, lado, k = (xk, yk), ld, kk; break
+                    if xy: w, h = wk, hk; break
+            if xy is None: w = max(180, w - 126)   # sin lugar al lado del producto, o sin saber dónde está: rótulo solo, sin flecha
+        # Ninguna gráfica tapa el producto si hay otro lugar (el producto es lo que se vende); si no hay, vale la regla de siempre.
+        if xy is None and pc:
+            xy = next(((x, y) for x, y in pos if y + h <= 880 and not choca((x, y, x + w, y + h), prohibido + [pc])), None)
+        if xy is None and not pc:
+            xy = next(((x, y) for x, y in pos if y + h <= 880 and not choca((x, y, x + w, y + h), prohibido)), None)
         # Si no entra a tamaño normal, se prueba achicada (75 % y 60 %) antes de omitirla (30-Oct, espejo: las gráficas grandes no
         # cabían en los planos cerrados). Se achica con zoom de CSS en la plantilla; las animaciones de GSAP no se tocan.
-        k = 1
         if xy is None and tipo not in ('ondas', 'reloj'):
-            for k in (0.75, 0.6):
-                wk, hk = round(w * k), round(h * k)
-                xs_k = list(dict.fromkeys([round(360 - wk / 2), 40, 680 - wk] + list(range(40, 680 - wk + 1, 40))))
-                xy = next(((x, y) for y in range(96, 880 - hk + 1, 10) for x in xs_k if not choca((x, y, x + wk, y + hk), prohibido)), None)
-                if xy: w, h = wk, hk; break
-        if xy is None: print(f'efecto {tipo} de la escena {ef["escena"]}: no entra sin tapar nada ni achicada, se omite · {w}x{h}'); continue
+            # Achicada, primero sin tapar el producto y recién después tapándolo (10-Nov, espejo de Lemirk: la lista de tildes achicada
+            # cayó sobre el espejo habiendo lugar al costado, porque al achicar ya no se miraba la caja del producto).
+            # Con el producto ubicado, una gráfica que solo entra tapándolo no va: el clip sale sin ella (el revisor final frena un
+            # rótulo sobre el producto, y un clip terminado vale más que una lista de tildes).
+            for veda in ([prohibido + [pc]] if pc else [prohibido]):
+                for k in (0.75, 0.6):
+                    wk, hk = round(w * k), round(h * k)
+                    xs_k = list(dict.fromkeys([round(360 - wk / 2), 40, 680 - wk] + list(range(40, 680 - wk + 1, 40))))
+                    xy = next(((x, y) for y in range(96, 880 - hk + 1, 10) for x in xs_k if not choca((x, y, x + wk, y + hk), veda)), None)
+                    if xy: w, h = wk, hk; break
+                if xy: break
+        if xy is None: print(f'efecto {tipo} de la escena {ef["escena"]}: no entra sin tapar nada ni achicada, se omite · {w}x{h} · ocupado: {[tuple(round(v) for v in b) for b in prohibido + ([pc] if pc else [])]}'); continue
         x, y = xy; ocupado.setdefault(ef['escena'], []).append(((x, y, x + w, y + h), t, t + dur_ef))
         base = {'tipo': tipo, 't': t, 'd': dur_ef, 'x': x, 'y': y}
         if k != 1: base.update(zoom=k, x=round(x / k), y=round(y / k))   # con zoom, left/top se escalan: se dividen
-        if tipo == 'paso': base.update(n=ef.get('n') or 1, txt=ef.get('txt') or '')
+        # La plantilla ya escribe «PASO n»: si el plan lo repite en el texto («PASO 1 · A LA PARED»), salía el 1 dos veces (05-Nov).
+        if tipo == 'paso': base.update(n=ef.get('n') or 1, txt=re.sub(r'^\s*PASO\s*\d+\s*[·:.\-–]?\s*', '', ef.get('txt') or '', flags=re.I))
         elif tipo == 'checks': base.update(items=(ef.get('items') or [])[:3])
         elif tipo == 'contador': base.update(hasta=max(2, min(9, int(ef.get('hasta') or 3))), txt=ef.get('txt') or '')
         elif tipo == 'sello': base.update(txt=ef.get('txt') or '¡LISTO!')
         elif tipo == 'timer': desde = max(3, min(10, int(ef.get('desde') or 5))); base.update(desde=desde, paso=round(dur_ef / (desde + 1), 3), txt=ef.get('txt') or '')
         elif tipo == 'brillo': base.update(txt=ef.get('txt') or '')
-        elif tipo in ('flecha', 'palabra', 'bateria'): base.update(txt=ef.get('txt') or '')
+        elif tipo == 'flecha': base.update(txt=ef.get('txt') or '', **({'lado': lado} if lado else {'sin_flecha': True}))
+        elif tipo in ('palabra', 'bateria'): base.update(txt=ef.get('txt') or '')
         elif tipo == 'barra': base.update(txt=ef.get('txt') or '', pct=max(10, min(100, int(ef.get('pct') or 100))))
         elif tipo == 'versus': base.update(antes=ef.get('antes') or '', despues=ef.get('despues') or '')
         elif tipo == 'reloj': base.update(x=x + 80, y=y + 80, txt=ef.get('txt') or '', llenado=round(min(1.4, dur_ef - 0.3), 2))
@@ -460,7 +710,7 @@ def main(d):
     b = open(f'{D}/build.mjs', encoding='utf8').read()
     open(f'{D}/build.mjs', 'w', encoding='utf8').write(b.replace('#E61B1E', m2))   # --m2: el acento de la esencia
     if not os.path.isdir(f'{D}/motion'):
-        run(['hyperframes', 'init', 'motion', '--video', 'edicion/corte.mp4', '--non-interactive'], cwd=D, shell=True)
+        run([_bin('hyperframes'), 'init', 'motion', '--video', 'edicion/corte.mp4', '--non-interactive'], cwd=D)
     shutil.copy(f'{E}/corte.mp4', f'{D}/motion/corte.mp4')
     for f in [f'{A}/grano.png', *marca['assets']]: shutil.copy(f, f'{D}/motion/')
     # cierre: el último cuadro de la historia, la foto del producto y el logo en alta si la marca lo tiene
@@ -481,8 +731,9 @@ def main(d):
     run(['node', 'build.mjs', 'config.json'], cwd=D)
     marca_en_html(f'{D}/motion/index.html', es, f'{D}/motion')
     fondo_logo(f'{D}/motion', marca.get('acento'), _contraste_blanco)
+    if marca.get('logo_sin_tarjeta'): logo_sin_tarjeta(f'{D}/motion')
     for f in glob.glob(f'{D}/motion/renders/*.mp4'): os.remove(f)
-    run(['hyperframes', 'render', '--quality', 'high'], cwd=f'{D}/motion', shell=True)
+    run([_bin('hyperframes'), 'render', '--quality', 'high'], cwd=f'{D}/motion')
     ren = sorted(glob.glob(f'{D}/motion/renders/*.mp4'))[-1]
     # 4. mezcla: voz + música con sidechain + efectos, -14 LUFS
     ev = [('pop', 0.2)] + [('whoosh', c - 0.08) for c in cuts] + [('pop', p['t'] + 0.05) for p in fx] + [('boom', cfg['logo_t'][0]), ('boom', REEL)]
@@ -516,7 +767,10 @@ def main(d):
     # pregunta gancho sobre franja de color, con el contraste medido. Es el primer cuadro y la miniatura.
     man = json.load(open(f'{d}/paneles/manifest.json', encoding='utf8'))
     car = plan['caratula']; CAR = f'{D}/caratula.png'
-    mc = marca['caratula']
+    mc = dict(marca['caratula'])
+    if marca.get('logo_sin_tarjeta'):
+        if recortar_blanco(mc['logo'], f'{D}/logo-recortado.png'): mc['logo'] = f'{D}/logo-recortado.png'
+        os.environ['LOGO_SIN_TARJETA'] = '1'
     run(['python', f'{AQUI}/caratula.py', f'{d}/{man[car["cuadro"] - 1]["archivo"]}', f'{d}/{car["foto"]}', car['pregunta'], car['nombre'],
          CAR, mc['logo'], ','.join(str(x) for x in mc.get('color', [176, 18, 23]))])
     run(['ffmpeg', '-y', '-loglevel', 'error', '-loop', '1', '-t', '0.6', '-i', CAR, '-f', 'lavfi', '-t', '0.6', '-i', 'anullsrc=r=48000:cl=stereo',

@@ -35,6 +35,28 @@ function resolverPython() {
   return 'python';
 }
 
+// Música distinta para UN pedido (12-Nov, Racer: «CAMBIAR LA MUSICA» sobre un video ya entregado). Se genera una sola vez por
+// pedido en su carpeta y el montaje la usa en lugar de la de la marca (montaje-opciones.json). No cambia la música de la marca.
+export async function musicaAlternativa(dir, anterior) {
+  const out = join(dir, 'musica-ajuste.mp3');
+  if (existsSync(out)) return out.replace(/\\/g, '/');
+  const prompt = 'Upbeat, energetic modern instrumental with a clear driving rhythm and a bright catchy melody, positive and dynamic. '
+    + (anterior ? 'It must sound clearly different from this previous track: «' + String(anterior).slice(0, 200) + '». ' : '')
+    + 'Instrumental only, no vocals, no lyrics, sits under a voiceover, clean ending.';
+  let m;
+  try {
+    m = await fetch('https://api.elevenlabs.io/v1/music?output_format=mp3_44100_128', {
+      method: 'POST', headers: { 'xi-api-key': clave(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, music_length_ms: 30000 }),
+    });
+  } catch (e) {
+    throw new Error(`No se pudo conectar a api.elevenlabs.io para música (red bloqueada o sin salida; habilitá api.elevenlabs.io en Configuración o corré en sesión local): ${e?.message || e}`);
+  }
+  if (!m.ok) throw new Error('música de ElevenLabs ' + m.status + ': ' + (await m.text()).slice(0, 200));
+  writeFileSync(out, Buffer.from(await m.arrayBuffer()));
+  return out.replace(/\\/g, '/');
+}
+
 // Color dominante del logo (sin blancos, negros ni grises), oscurecido hasta 4,5:1 contra el blanco. Si el logo es todo
 // blanco y negro, queda un gris carbón. También imprime el tamaño natural WxH en stderr/segunda línea si hace falta.
 const PY_COLOR = `

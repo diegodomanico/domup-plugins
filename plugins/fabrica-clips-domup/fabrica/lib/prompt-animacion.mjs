@@ -4,7 +4,7 @@
 // verificaba; faltaban «Nobody speaks» con la boca cerrada en las escenas en off (Est.: «lo que va en off se anima con la boca
 // cerrada»), «keeps exactly its size» y el lint de prevuelo --tipo animacion. Un bloque fijo no se puede olvidar.
 // Uso: node lib/prompt-animacion.mjs <dir>   (escribe escenas[].prompt en anim-plan.json)
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const IDIOMA = { MLA: 'Argentine Spanish (Rioplatense, voseo)', MLU: 'Uruguayan Spanish (voseo)', MLM: 'Mexican Spanish',
@@ -17,6 +17,17 @@ export function armarPrompts(dir) {
   const idioma = IDIOMA[pedido.item.id.slice(0, 3)] || 'Spanish';
   const prod = a.producto_corto || 'the product';
   const man = (() => { try { return JSON.parse(readFileSync(join(dir, 'paneles', 'manifest.json'), 'utf8')); } catch { return []; } })();
+  // 14-Nov (alimento de TecnoTienda a7f3dd7d, 1acb4653 y 86a424c7): Flow redibujaba las letras del envase al animar («NACUNO Y
+  // POLLO», «Pet Fomily») y el revisor final frenaba el clip ya montado. Bloque fijo nuevo: el texto impreso del producto queda
+  // como en el primer cuadro. Va solo en planes nuevos (bloque_texto), para que un plan ya animado no cambie de prompt y se
+  // vuelva a animar entero por esto.
+  // La decisión vive en un archivo de la carpeta (bloque-texto.txt), no en el plan: una corrección que reescribe el plan no la pierde.
+  {
+    const marca = join(dir, 'bloque-texto.txt');
+    const yaAnimado = (() => { try { return Object.values(JSON.parse(readFileSync(join(dir, 'anim', 'manifest.json'), 'utf8')).escenas || {}).some((x) => x && x.prompt); } catch { return false; } })();
+    if (!existsSync(marca) && !yaAnimado) writeFileSync(marca, new Date().toISOString());
+    a.bloque_texto = existsSync(marca);
+  }
   for (const [i, e] of a.escenas.entries()) {
     const cuadro = plan.cuadros[i] || {};
     const cam = (e.frases || []).find((f) => f.modo === 'camara');
@@ -29,6 +40,7 @@ export function armarPrompts(dir) {
       'STATIC LOCKED-OFF CAMERA: no zoom, no pan, no push-in, single continuous shot, NO cuts.',
       e.accion.trim(),
       cuadro.muestra_producto ? `${prod[0].toUpperCase()}${prod.slice(1)} keeps exactly its size and shape, exactly as in the first frame.${solo ? '' : ' Same proportion to the hand as in the first frame.'}` : '',
+      cuadro.muestra_producto && a.bloque_texto === true ? 'Every letter, logo and printed text on the product and its packaging stays EXACTLY as in the first frame: same words, sharp and readable, never redrawn, never morphing; if the product moves, its printed face moves rigidly like a flat sticker.' : '',
       solo ? 'Nobody is in this shot: NO hands, NO arms, NO people enter the frame at any moment, nobody touches anything; the only motion is light and the action described.' : '',
       cam
         ? `${ref[0].toUpperCase()}${ref.slice(1)} looks straight into the camera and, starting within the first half second, SPEAKS this line in ${idioma}, with clear natural lip movement matching every syllable: "${cam.texto}" Then closes the mouth and smiles. AUDIO: only that voice saying exactly that line, NO music, quiet room tone. Nobody else speaks.`

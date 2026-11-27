@@ -67,7 +67,7 @@ Seguí la habilidad de Claude en Chrome (pestaña nueva, nunca una del vendedor)
 1. Esperá un minuto y volvé a leer la publicación con `item`: cantidad de fotos y que la primera sea la nueva.
 2. Abrí la publicación pública (`Ver`) y confirmá a ojo la portada.
 3. Reportá en una línea: «✅ <item> · 12 fotos nuevas · respaldo en respaldos/<carpeta>». Si algo no coincide, decí qué y ofrecé deshacer.
-4. Registrá en domup.app con `clip_registrar_paso(cust_id?, clip_ref, paso="subido_fotos", estado="ok"|"error", item_id, detalle={ fotos_subidas, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json` (o armando `<item>-<aaaammdd-hhmm>` si se corrió suelta). Si falla el registro, avisá y seguí, nunca frenes el flujo por eso.
+4. **Regla obligatoria de trazabilidad**: registrá en domup.app con `clip_registrar_paso(cust_id?, clip_ref, paso="subido_fotos", estado="ok"|"error"|"aviso", item_id, detalle={ fotos_subidas, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json` (o armando `<item>-<aaaammdd-hhmm>` si se corrió suelta). Nunca mandes llaves ni rutas locales; si falla el registro, avisá y seguí, nunca frenes el flujo por eso.
 
 ## Deshacer: «volvé a las fotos de antes»
 

@@ -47,6 +47,15 @@ TAREA
      trae "elencos_recientes" (los grupos de los últimos clips de la marca), cada guion usa un grupo distinto de esos: la pareja
      principal sola no se repite clip tras clip.
    - Variante de idioma de la esencia (voseo/tuteo/neutro); la marca escrita como dice «pronunciacion».
+   - SIN DOBLE LECTURA (Diego, 04-Nov: «¿Me prestas el redondo?» en un cojín, en Chile). Leé ENTERO
+     ${CLAUDE_PLUGIN_ROOT}/fabrica/consignas/palabras-por-pais.md y aplicá la regla general y la lista
+     del país de la publicación (MLC Chile, MLA Argentina, MLM México, MCO Colombia, MLU Uruguay). El producto se nombra por lo
+     que es, nunca por un apodo de su forma.
+     · LAS FRASES DE TAMAÑO NOMBRAN EL OBJETO (14-Nov: el revisor de sentido rechazó «Ese es enorme», dicho de un tubo medido con
+       cinta, en México, y «¿qué medida tienen?», dicho de unas velas, en Chile; cada rechazo es una vuelta entera de guiones). Toda
+       frase que habla de tamaño, largo, grosor o medida lleva el nombre del producto adentro y el número si lo hay: «El tubo mide
+       un metro veinte», «Las velas miden diez centímetros». Nunca un pronombre ni un adjetivo suelto («ese es enorme», «qué
+       grande», «la tiene larga», «¿cuánto mide?», «¿qué medida tiene?»), y nunca un chiste montado sobre el tamaño.
    - Ortografía completa, con tildes y signos de apertura: en voseo «mirá», «probá», «vení», «sillón», «acá».
    - Ninguna promesa que no esté en el título o la ficha (por ejemplo «no mancha» o «lavable» solo si la ficha lo dice).
    - Prohibido: precios, promos, envíos, cuotas, links, «seguinos», garantías que no estén en la ficha. Tampoco (reglas de
@@ -84,6 +93,8 @@ TAREA
    - TEXTO ACTUADO (Diego, 30-Oct: las voces «suenan sin vida, apáticas»; eligió en la prueba A/B/C la versión con el texto
      actuado). Cada frase se escribe como se DICE, con la emoción en la puntuación: «¡» y «?» donde va, pausas con «…», y una
      muletilla natural cuando suma («¡No te lo puedo creer!», «¡Tranqui!», «Bueno… ahora sí»). Nada de frases planas de folleto.
+   - SI NINGÚN VIDEO DEL RELEVAMIENTO ES DE ESTE PRODUCTO (producto de nicho): no es un error y no se frena. Dejá virales.json
+     como una lista vacía [] y armá los TRES guiones sobre moldes de la casa (campo "molde" con el id de la biblioteca).
    - MOLDES DE LA CASA: el pedido trae "moldes" (la biblioteca de estructuras aprobadas, cada una con para qué productos sirve,
      sus pasos y sus efectos). Cada guion se arma sobre UN molde: uno de la biblioteca que sirva para este producto, o el molde de
      un viral de virales.json. Anotá en cada guion "molde": "<id de la biblioteca o 'viral:<url>'>" y probá moldes distintos en

@@ -28,9 +28,13 @@ Leé las páginas con `get_page_text` o `read_page`. Anotá en `virales-crudo.js
 ## 3 · Los 3 guiones
 
 Seguí `references/guiones.md` al pie de la letra: 6 a 12 virales elegidos con su **molde** (gancho, beats, recurso, sirve_para), 3 guiones de **exactamente 6 escenas** de 2 a 3 s, de 5 a 7 palabras cada una, cada uno sobre un molde distinto (biblioteca de la casa en `${CLAUDE_PLUGIN_ROOT}/fabrica/moldes/` o el molde de un viral), triple gancho, lo que se nombra se ve, al menos 2 lugares, texto actuado, una misión por video, variedad de elenco y las prohibiciones. Uno solo va como recomendado, con su porqué en una línea.
+- **Chicos en elenco (`nina`/`nino`) y regla `ep09`**: nunca saques a un chico del elenco; en escenas donde comparte cuadro con un adulto no pongas contacto físico ni pase de objetos (ej. *"Laura apoya la mochila en el sillón y Sofía se acerca a mirar"* en vez de *"Laura le da la mochila a Sofía en la mano"*). Prohibido generar scripts `.ps1`.
 
-## 4 · La puerta
+## 4 · La puerta (controles puros + subagente revisor de sentido)
 
-Pasá los 3 por `references/revisor-sentido.md` y reescribí lo que marque antes de mostrarlos. Mostralos como 3 fichas cortas (título, gancho visual/verbal/texto, las 6 escenas en una línea cada una, personajes, molde y el viral que lo inspira con su métrica). El vendedor elige uno: es su primera de 3 decisiones.
+1. Corré el control puro de la fábrica: `node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/controles-puros.mjs guiones <carpeta del clip>` (ejecuta `arreglarGuionesSolos`, `escenasDe` y `controlarGuionesForma` exactos de la fábrica). Si devuelve fallas, corregilas hasta que imprima `✓ guiones OK`.
+2. Corré `references/revisor-sentido.md` en un **subagente separado** (nunca un `claude -p` anidado) con `guiones.json`, `pedido.json` y `voz-comprador.md` como contexto, y reescribí lo que marque antes de mostrar los 3 guiones. Mostralos como 3 fichas cortas (título, gancho visual/verbal/texto, las 6 escenas en una línea cada una, personajes, molde y el viral que lo inspira con su métrica). El vendedor elige uno: es su primera de 3 decisiones.
 
-Guardá `virales.json`, `voz-comprador.md` y `guiones.json` en la carpeta del clip. Apenas el vendedor elija el guion (o si falla el paso), registrá en domup.app con `clip_registrar_paso(cust_id?, clip_ref, paso="guion", estado="ok"|"error", item_id, detalle={ guion: "<texto completo del guion elegido, sin datos personales>", molde, plugin_version })` usando el `clip_ref` de `clip-<item>/config.json` (si no existe, crealo ahí como `<item>-<aaaammdd-hhmm>`). Si falla el registro, avisá y seguí, nunca frenes el clip por eso.
+Guardá `virales.json`, `voz-comprador.md` y `guiones.json` en la carpeta del clip.
+
+**Regla obligatoria de trazabilidad**: apenas el vendedor elija el guion (o si falla/hay aviso en el paso), llamá a `clip_registrar_paso(cust_id?, clip_ref, paso="guion", estado="ok"|"error"|"aviso", item_id, detalle={ guion: "<texto completo del guion elegido, sin datos personales>", molde, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json` (si no existe, crealo ahí como `<item>-<aaaammdd-hhmm>`). Nunca mandes llaves ni rutas locales; si falla el registro, avisá y seguí, nunca frenes el clip por eso.

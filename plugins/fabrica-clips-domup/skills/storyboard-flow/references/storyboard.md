@@ -40,6 +40,9 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
      declare "logo": "locacion" o "ambos", pasá la referencia del logo (<id del pedido>-logo.png) a Flow para que lo dibuje igual
      a la imagen de referencia (en un objeto de la locación, nunca sobre el producto ni tapando una cara). Si la marca no tiene
      logo cargado, no inventes ninguno y dejá anotado «sin logo cargado» en storyboard.md.
+     OTRA SESIÓN DE FLOW (09-Nov, carriles en paralelo): si un proyecto o un mediaId de una vuelta anterior no existe o no abre, el
+     pedido empezó en otra cuenta de Flow. No es un error: creá un proyecto nuevo acá, subí de nuevo desde la carpeta los archivos
+     que necesites (fotos, retratos, placas y los cuadros ya aprobados de paneles/) y seguí; los cuadros aprobados no se regeneran.
    - SIN LIENZO CUANDO HAY LOCACIONES (Diego, 31-Oct): si plan.json trae "sets_usados" (locaciones con placas), NO generes el
      lienzo: cada cuadro se genera directo en alta (768x1376) con su placa (la que declara "placa"), las 3 fotos del producto,
      las vistas de la hoja de personaje y el bloque PRODUCTO + SCALE LOCK en el prompt. La placa ya fija el lugar y la hoja la
@@ -73,6 +76,29 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
    - Personajes SIEMPRE desde su retrato, con sus rasgos nombrados. El producto, en lo posible, sostenido a la altura de la
      cara (apoyado adelante en la mesa Flow lo agranda).
 
+2b. REVISOR POR CUADRO, APENAS SALE (04-Nov, Diego: obligatorio). Medido la semana anterior: el revisor del final rechazaba
+   3 de cada 4 storyboards, casi siempre por el TAMAÑO del producto (Flow lo agranda 2-3 veces) o por muebles que cambian de
+   lugar, y cada vuelta entera costaba USD 7-10. Regenerar un cuadro en Flow es gratis. Entonces, cada cuadro, en orden:
+     a. lo generás y lo bajás a paneles/;
+     b. corrés (Bash con timeout 600000):
+          node ${CLAUDE_PLUGIN_ROOT}/fabrica/revisar-cuadro.mjs <n> paneles/<archivo> "<qué pasa y qué se dice>"
+        Es un revisor independiente: no lo discutas ni lo saltees. Mira ese cuadro contra las fotos, los retratos, las medidas
+        y los cuadros que ya aprobó.
+     c. «✗»: regenerá ESE cuadro corrigiendo exactamente lo que dice (si es tamaño: producto más chico/más grande contra la mano
+        o la cara, y la frase de escala; si es un mueble: la misma placa o el cuadro de referencia del cuarto) y volvé a b.
+        Máximo 3 regeneraciones por cuadro; si a la 3.ª sigue «✗», dejá la mejor y anotalo en storyboard.md.
+     d. «✓»: recién ahí pasás al cuadro siguiente. Salida 2 (no se pudo revisar): reintentá una vez y seguí.
+   Si regenerás un cuadro después (por el paso 3), volvé a correr b sobre él.
+   e. CORREGIR UN CUADRO = EDITAR UN APROBADO, NO GENERAR DE CERO (05-Nov, rack de VentiMaku: tres vueltas, US$ 27). Cuando
+      el set ya tiene cuadros aprobados, el cuadro que se rehace se pide como EDICIÓN de uno aprobado del mismo set, subido con
+      nombre único: «Recreate the first reference image EXACTLY: same kitchen, same camera… The only change: …». Sin eso, Flow
+      inventa otra cocina (estantes abiertos, otra pared, la ventana en otro lugar) aunque el prompt la describa entera.
+      Para un plano más cerrado, editá el cuadro vecino pidiendo solo el acercamiento; para uno general, editá el aprobado
+      general del set (en el rack, c8) y cambiá solo las personas.
+   f. NADIE SALE DEL CUADRO SIN MOTIVO: si un personaje está en el cuadro anterior y vuelve después (el gato en c4 y c7), en
+      el cuadro del medio sigue en su lugar, aunque sea chico o desenfocado. Acercar el plano no alcanza si su lugar sigue
+      dentro del cuadro. Si de verdad lo sacás, el bloque «Coherencia» de storyboard.md tiene que decirlo cuadro por cuadro.
+
 3. TUS CONTROLES ANTES DE ENTREGAR (después el programa los vuelve a correr él mismo y rechaza lo que no pase)
    - Caras: python ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/revisor_caras.py <retrato> <hoja.jpg> <paneles donde aparece>
      por cada personaje. Si marca ✗, regenerá ese panel.
@@ -97,4 +123,7 @@ medidas pésimas, tres productos distintos, sin la fila de 3 ángulos y sin revi
    - storyboard.jpg: hoja con la FILA DE ARRIBA = los 3 ángulos del producto (rotulados «PRODUCTO · FRENTE / LADO / DETALLE»,
      o «GENERADA») y debajo los 6 cuadros en 2 filas de 3, numerados, con el texto de cada uno abajo.
    - medidas.md, producto.md, storyboard.md, ids-flow.txt.
+   SI FLOW CONTESTA «PUBLIC_ERROR_UNUSUAL_ACTIVITY» (su chequeo anti-robot): no esperes ni reintentes, no pruebes otro modelo ni
+   otro camino. Cortá en el momento y respondé «ERROR: PUBLIC_ERROR_UNUSUAL_ACTIVITY». El programa pausa Flow y retoma solo;
+   lo que ya generaste queda en la carpeta y se reusa.
 5. Terminá respondiendo una sola línea: «OK storyboard» o «ERROR: <motivo>».

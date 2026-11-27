@@ -46,7 +46,8 @@ Revisá cuadro por cuadro y después ENTRE cuadros:
    cuadro, también las cortadas por el borde. Si son más que las del producto, o el grupo «completo» tiene una de menos, es
    falla BLOQUEANTE, aunque la diferencia sea de una.
 2. ESCALA: el producto tiene el tamaño de las medidas contra manos, caras y muebles. Más grande o más chico que lo real
-   (más de ± 20 %) es falla. Compará el tamaño ENTRE cuadros: si cambia, es falla.
+   (más de ± 25 % en una estimación a ojo; entre 20 y 25 % es «menor») es falla. (05-Nov: una medición a ojo tiene ±10 puntos de
+   error; con el tope en 20 el mismo cuadro del rack dio +19 % en un revisor y +27 % en el otro, y se rechazó tres vueltas.) Compará el tamaño ENTRE cuadros: si cambia, es falla.
    En CADA cuadro donde aparece el producto, estimá su tamaño en cm contra un objeto de medida conocida que esté a la misma
    distancia de la cámara: celular 15 cm de alto, mano 18 cm, cara 23 cm, notebook abierta 30 cm de pantalla. Escribí la
    estimación de cada cuadro en "notas" («c4: barra ≈ 2,7 celulares ≈ 40 cm contra 25 reales»). Fuera de ± 25 % es
@@ -58,14 +59,24 @@ Revisá cuadro por cuadro y después ENTRE cuadros:
    en el pecho del avatar. Si hay logo cargado en {{LOGO}}, es falla BLOQUEANTE si ningún cuadro muestra el logo de la marca en
    la locación, o si el logo aparece deformado, inventado o con letras inventadas. Si {{LOGO}} indica «sin logo cargado», NO
    frenes por falta de logo y anotalo en "notas" como «sin logo cargado».
+4b. LO QUE SE NOMBRA SE VE (05-Nov, antes solo lo miraba el revisor del video final, cuando ya no tiene arreglo barato): cada
+   personaje, objeto o acción que nombra el texto de un cuadro («hasta el gato», «la micro SD», «alguien en el muro») se ve en
+   ESE cuadro o en el de al lado. Si el guion lo nombra y ningún cuadro lo muestra: bloqueante.
 5. (Los cuadros en la cabina roja del confesionario de la marca son correctos: no cuentan como otra casa.) La casa es la misma en todos los cuadros (distintos ambientes de la MISMA casa, como el living y el comedor, están bien;
    otra casa, otra luz o otro estilo, no). El texto impreso que el producto real tiene (por ejemplo su nombre en la tapa)
    está bien si se parece al real; si sale deformado, anotalo en notas, no como falla.
 6. ACCIONES FÍSICAMENTE POSIBLES: NO APTO (`bloqueante`) si un animal, persona u objeto hace algo irreal o anatómicamente imposible (por ejemplo: un perro que lame con una lengua que atraviesa un objeto o el aire de forma imposible, objetos que flotan sin sostén, manos o brazos con articulaciones imposibles o que atraviesan cosas sólidas).
 
-SEVERIDAD: «bloqueante» = otro producto (forma, color de una parte grande, cómo abre), escala fuera de ± 20 %, personaje o
+SEVERIDAD: «bloqueante» = otro producto (forma, color de una parte grande, cómo abre), escala fuera de ± 25 % (a ojo) o salto de tamaño de más de 25 % entre cuadros seguidos, personaje o
 animal distinto a su retrato (cara, ropa, raza), acción físicamente irreal o anatómicamente imposible, otra casa, texto inventado legible. «menor» = detalles del estampado,
 objetos chicos del fondo, dibujos infantiles, el nombre impreso algo deformado. "apto" es false solo con alguna bloqueante.
+- FONDO QUE NADIE TOCA (Diego, 11-Nov: 10 storyboards frenados por una lámpara colgante que aparece en un solo cuadro, sillas que
+  no coinciden o cajas distintas en el techo del auto; cada corrección arreglaba un cuadro y aparecía otro): un objeto del fondo que
+  ningún personaje usa, toca ni mueve, que el guion no nombra y que no es el producto (una lámpara, una silla de más o de menos,
+  cajas apiladas, un cuadro, una planta, un adorno) y que aparece, falta, cambia de tamaño o de cantidad entre cuadros es severidad
+  «menor», NO bloqueante. Esto manda sobre MUEBLES y COCINA ENTERA para esos objetos. Sigue siendo bloqueante: otro lugar u otra
+  casa; una pared, ventana, puerta o alacena que cambia de tipo o de sitio; el mueble que un personaje usa (la mesa donde apoya, la
+  silla donde se sienta, la escalera a la que sube); y todo objeto que el guion nombra o que alguien tiene en la mano.
 Un personaje que ocupa menos de un tercio del alto del cuadro (al fondo, lejos): antes de marcar una falla de pelo, peinado o
 accesorio, mirá la parte de arriba de su cabeza con atención; si la colita, el scrunchie o el detalle se ve aunque sea chico,
 NO es falla. Si de verdad no se distingue, es «menor», nunca «bloqueante». (24-Oct, máscara de zombie: se rechazó dos veces

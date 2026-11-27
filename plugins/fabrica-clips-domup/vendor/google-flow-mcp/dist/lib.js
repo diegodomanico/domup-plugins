@@ -160109,12 +160109,12 @@ var request2 = import_index.default.request;
 var _electron = import_index.default._electron;
 var _android = import_index.default._android;
 
-// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/browser.js
+// ../AppData/Local/Temp/flow-bundle-stage-YCIdkN/browser.js
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { mkdirSync as mkdirSync2 } from "node:fs";
 
-// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/bridge.js
+// ../AppData/Local/Temp/flow-bundle-stage-YCIdkN/bridge.js
 var BRIDGE_JS = String.raw`
 (() => {
   if (window.__flowMcp && window.__flowMcp.version === 3) return 'present';
@@ -160177,7 +160177,7 @@ var BRIDGE_JS = String.raw`
 })()
 `;
 
-// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/browser.js
+// ../AppData/Local/Temp/flow-bundle-stage-YCIdkN/browser.js
 var FLOW_ORIGIN = "https://flow.google.com";
 function optionsFromEnv() {
   const profileDir2 = process.env.FLOW_PROFILE_DIR || join(homedir(), ".google-flow-mcp", "profile");
@@ -160281,12 +160281,12 @@ var FlowBrowser = class {
   }
 };
 
-// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/flow.js
+// ../AppData/Local/Temp/flow-bundle-stage-YCIdkN/flow.js
 import { appendFileSync, copyFileSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, extname, join as join2, resolve } from "node:path";
 
-// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/protocol.js
+// ../AppData/Local/Temp/flow-bundle-stage-YCIdkN/protocol.js
 var RPC = {
   // projects
   listProjects: "UpteDb",
@@ -160699,7 +160699,7 @@ function extractA2uiText(raw) {
   return [...new Set(out)].join("\n");
 }
 
-// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/ui.js
+// ../AppData/Local/Temp/flow-bundle-stage-YCIdkN/ui.js
 var GEN_RPCS = /rpcids=(MZZa6b|YhhmEf|eb1hJf|nprQif|jIps6|fZytfe|ogiZ0b)\b/;
 var STREAM_CHAT = /FlowCreationAgentService\/StreamChat/;
 var UiError = class extends Error {
@@ -160931,14 +160931,26 @@ var FlowUi = class {
     await this.menuOpen().waitFor({ state: "hidden", timeout: 5e3 }).catch(() => {
     });
   }
+  async dismissOverlayBackdrop() {
+    const bd = this.page.locator(".cdk-overlay-backdrop-showing");
+    if (await bd.count().catch(() => 0) > 0) {
+      await this.page.keyboard.press("Escape").catch(() => {
+      });
+      await bd.first().waitFor({ state: "hidden", timeout: 3e3 }).catch(() => {
+      });
+      await this.page.waitForTimeout(200);
+    }
+  }
   /** Tag the smallest visible element whose normalised text matches `source` and click it. */
-  async clickText(source12, what, required = true) {
+  async clickText(source12, what, required = true, force = false) {
     const found = await this.page.evaluate((src) => {
       const re2 = new RegExp(src);
       const txt = (e) => (e.innerText || "").trim().replace(/\s+/g, " ");
       const vis = (e) => !!(e.offsetParent && e.getBoundingClientRect().width > 0);
+      const panes = [...document.querySelectorAll(".cdk-overlay-pane")].filter(vis);
+      const roots = panes.length ? panes : [document];
       document.querySelectorAll("[data-flowmcp-click]").forEach((e) => e.removeAttribute("data-flowmcp-click"));
-      const el = [...document.querySelectorAll("button, [role=radio], [role=tab], [role=option], [role=menuitem], mat-option, li, div, span")].filter((e) => vis(e) && re2.test(txt(e))).sort((a, b) => txt(a).length - txt(b).length || a.querySelectorAll("*").length - b.querySelectorAll("*").length)[0];
+      const el = roots.flatMap((r) => [...r.querySelectorAll("button, [role=radio], [role=tab], [role=option], [role=menuitem], mat-option, li, div, span")]).filter((e) => vis(e) && re2.test(txt(e))).sort((a, b) => txt(a).length - txt(b).length || a.querySelectorAll("*").length - b.querySelectorAll("*").length)[0];
       if (el)
         el.setAttribute("data-flowmcp-click", "1");
       return !!el;
@@ -160948,7 +160960,7 @@ var FlowUi = class {
         throw new UiError(`Flow setting not available: ${what}`);
       return false;
     }
-    await this.page.locator("[data-flowmcp-click]").first().click();
+    await this.page.locator("[data-flowmcp-click]").first().click(force ? { force: true } : void 0);
     await this.page.waitForTimeout(400);
     return true;
   }
@@ -160996,7 +161008,7 @@ var FlowUi = class {
       const c1 = await this.tagComposer();
       if (!await c1.locator('button[aria-label="Settings trigger"]').isVisible().catch(() => false)) {
         const botones2 = await this.listComposerButtonTexts();
-        throw new UiError(`Flow shows only the agent composer in this project and clicking Agent did not bring back manual mode. Use flow_agent_chat. Botones visibles cerca del compositor: ${botones2.length ? botones2.map((b) => JSON.stringify(b)).join(", ") : "(ninguno)"}`);
+        throw new UiError(`Flow qued\xF3 en modo agente en este proyecto y el clic en Agent no devolvi\xF3 el modo manual. Reintent\xE1 en modo manual (o cerr\xE1 y reabr\xED Flow); solo las escenas con chicos van por el agente. Botones visibles cerca del compositor: ${botones2.length ? botones2.map((b) => JSON.stringify(b)).join(", ") : "(ninguno)"}`);
       }
       return;
     }
@@ -161013,8 +161025,23 @@ var FlowUi = class {
     const botones = await this.listComposerButtonTexts();
     throw new UiError(`Could not switch Flow's composer to ${want} mode. Botones visibles cerca del compositor: ${botones.length ? botones.map((b) => JSON.stringify(b)).join(", ") : "(ninguno)"}`);
   }
-  /** Apply settings and return Flow's own credit quote. */
+  /** Apply settings and return Flow's own credit quote (retries once if overlay/UI intercepts). */
   async configure(s) {
+    try {
+      return await this.configureOnce(s);
+    } catch (err) {
+      if (err instanceof UiError && /no disponible en esta cuenta/i.test(err.message))
+        throw err;
+      await this.page.keyboard.press("Escape").catch(() => {
+      });
+      await this.dismissOverlayBackdrop();
+      await this.closeSettings().catch(() => {
+      });
+      await this.page.waitForTimeout(400);
+      return await this.configureOnce(s);
+    }
+  }
+  async configureOnce(s) {
     await this.openSettings();
     await this.clickText(s.kind === "image" ? "^image Image$" : "^videocam Video$", s.kind);
     if (s.kind === "video")
@@ -161024,17 +161051,49 @@ var FlowUi = class {
       await this.clickText(`^${icon[s.aspect]} ${esc(s.aspect)}$`, `aspect ${s.aspect}`);
     }
     if (s.model) {
-      const current = await this.page.getByText(/arrow_drop_down/).filter({ visible: true }).first().textContent().catch(() => "");
+      const current = await this.page.locator(".cdk-overlay-pane button").filter({ hasText: /arrow_drop_down/ }).first().innerText().catch(() => "");
       if (!current?.includes(s.model)) {
-        await this.clickText("^(\u{1F34C} )?[A-Za-z].* arrow_drop_down$", "model menu");
-        await this.clickText(`^(volume_up )?(\u{1F34C} )?${esc(s.model)}$`, `model "${s.model}"`);
+        if (await this.page.locator(".cdk-overlay-pane").count().catch(() => 0) > 1) {
+          await this.dismissOverlayBackdrop();
+        }
+        await this.clickText("^(\u{1F34C} )?[A-Za-z].* arrow_drop_down$", "model menu", true, true);
+        const okModel = await this.clickText(`^(volume_up )?(\u{1F34C} )?${esc(s.model)}$`, `model "${s.model}"`, false, true);
+        if (!okModel) {
+          const avail = (await this.page.locator("[role=option], [role=menuitem], mat-option").allInnerTexts().catch(() => [])).map((x) => x.replace(/\s+/g, " ").trim()).filter(Boolean);
+          await this.page.keyboard.press("Escape").catch(() => {
+          });
+          throw new UiError(`Modelo "${s.model}" no disponible en esta cuenta de Flow (revis\xE1 tu plan de Google; disponibles: ${avail.join(", ") || "ninguno"}).`);
+        }
         await this.page.waitForTimeout(600);
       }
     }
     if (s.resolution)
       await this.clickText(`^${esc(s.resolution)}$`, `resolution ${s.resolution} for ${s.model ?? "this model"}`);
-    if (s.durationSec)
-      await this.clickText(`^${s.durationSec}s$`, `${s.durationSec}s duration for ${s.model ?? "this model"}`);
+    if (s.durationSec) {
+      const pillOk = await this.clickText(`^${s.durationSec}s$`, `${s.durationSec}s duration for ${s.model ?? "this model"}`, false);
+      if (!pillOk) {
+        const slider = this.page.locator('input[type="range"][aria-label="Length"]').last();
+        if (await slider.isVisible().catch(() => false)) {
+          const valEl = this.page.locator(".duration-slider-value").last();
+          await slider.focus();
+          for (let i = 0; i < 16; i++) {
+            const txt = (await valEl.textContent().catch(() => "") || "").trim();
+            const curSec = Number(txt.match(/(\d+)/)?.[1] ?? NaN);
+            if (!Number.isFinite(curSec) || curSec === s.durationSec)
+              break;
+            await this.page.keyboard.press(curSec > s.durationSec ? "ArrowLeft" : "ArrowRight");
+            await this.page.waitForTimeout(120);
+          }
+          const afterTxt = (await valEl.textContent().catch(() => "") || "").trim();
+          const afterSec = Number(afterTxt.match(/(\d+)/)?.[1] ?? NaN);
+          if (afterSec !== s.durationSec) {
+            throw new UiError(`Flow setting not available: ${s.durationSec}s duration for ${s.model ?? "this model"} (Length: ${afterTxt || "desconocido"}).`);
+          }
+        } else {
+          throw new UiError(`Flow setting not available: ${s.durationSec}s duration for ${s.model ?? "this model"}`);
+        }
+      }
+    }
     if (s.count)
       await this.clickText(`^x${s.count}$`, `count x${s.count}`);
     await this.page.waitForTimeout(500);
@@ -161055,13 +161114,15 @@ var FlowUi = class {
     const options2 = this.page.locator(".asset-item-container button[role=option]");
     await options2.first().waitFor({ state: "visible", timeout: 1e4 }).catch(() => {
     });
-    const search = this.page.getByPlaceholder("Search assets");
+    const search = this.page.locator('input[aria-label="Search assets"], input[placeholder="Search assets"], input[placeholder="Search"]').last();
     if (await search.isVisible().catch(() => false)) {
       await search.fill(name);
-      await this.page.waitForTimeout(1200);
+      await this.page.waitForTimeout(1e3);
     }
     const typeWord = kind === "character" ? "Character" : kind === "video" ? "Video" : "Image";
     const item = options2.filter({ hasText: new RegExp(`^\\s*${esc(name)}\\s*${typeWord}\\b`, "i") }).first();
+    await item.waitFor({ state: "visible", timeout: 8e3 }).catch(() => {
+    });
     if (!await item.count()) {
       await this.page.keyboard.press("Escape").catch(() => {
       });
@@ -161164,7 +161225,7 @@ var FlowUi = class {
   }
 };
 
-// ../AppData/Local/Temp/flow-bundle-stage-viPuwI/flow.js
+// ../AppData/Local/Temp/flow-bundle-stage-YCIdkN/flow.js
 var MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
 var VALID_UPLOAD_EXT = /* @__PURE__ */ new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 var FlowError = class extends Error {
@@ -161214,19 +161275,30 @@ function anotarImagenes(n, extra = {}) {
 }
 var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 var newUuid = () => crypto.randomUUID().toUpperCase();
+var CODIGOS_FLOW = {
+  PUBLIC_ERROR_MINOR: "chicos en una situaci\xF3n que el filtro lee como riesgosa: un chico solo, en contacto f\xEDsico estrecho o en ropa m\xEDnima (si son chicos, us\xE1 retry_with_agent=true)",
+  PUBLIC_ERROR_MINORS: "chicos en una situaci\xF3n que el filtro lee como riesgosa: un chico solo, en contacto f\xEDsico estrecho o en ropa m\xEDnima (si son chicos, us\xE1 retry_with_agent=true)",
+  PUBLIC_ERROR_SEXUAL: "algo que el filtro lee como sexual: ropa m\xEDnima, poses o cuerpos en primer plano",
+  PUBLIC_ERROR_VIOLENCE: "algo que el filtro lee como violento: golpes, ca\xEDdas, armas o sangre",
+  PUBLIC_ERROR_PERSON_GENERATION: "la persona de la referencia o una persona real reconocible",
+  PUBLIC_ERROR_DANGEROUS: "una acci\xF3n peligrosa: fuego, electricidad, alturas o herramientas en uso",
+  PUBLIC_ERROR_PROMINENT_PEOPLE_FILTER_FAILED: "el filtro cree que la cara del cuadro se parece a una persona famosa: pedir lo mismo en manual da lo mismo (prob\xE1 con agente si corresponde)",
+  PUBLIC_ERROR_UNSAFE_GENERATION: "el filtro de seguridad bloque\xF3 el cuadro o el prompt (revis\xE1 contacto adulto-chico ep09, ropa o postura; si son chicos, us\xE1 retry_with_agent=true)",
+  PUBLIC_ERROR_UNUSUAL_ACTIVITY: "el chequeo anti-robot de Flow (no es el prompt): esperar un rato y reintentar"
+};
 function describeError(e) {
   const s = JSON.stringify(e);
   const pub = s.match(/PUBLIC_ERROR_[A-Z_]+/)?.[0];
-  if (pub === "PUBLIC_ERROR_UNUSUAL_ACTIVITY")
-    return "Flow refused the request (PUBLIC_ERROR_UNUSUAL_ACTIVITY: its bot check flagged it). Wait a while and try again, or generate in the Flow UI yourself.";
+  if (pub && CODIGOS_FLOW[pub])
+    return `Flow refused the request (${pub}: ${CODIGOS_FLOW[pub]})`;
   if (pub)
     return `Flow refused the request: ${pub}`;
   return `Flow error ${s}`;
 }
+var uiQueue = Promise.resolve();
 var FlowClient = class {
   browser;
   modelCache;
-  uiQueue = Promise.resolve();
   constructor(browser) {
     this.browser = browser;
   }
@@ -161253,8 +161325,8 @@ var FlowClient = class {
         throw e;
       }
     };
-    const next = this.uiQueue.then(run, run);
-    this.uiQueue = next.catch(() => void 0);
+    const next = uiQueue.then(run, run);
+    uiQueue = next.catch(() => void 0);
     return next;
   }
   async status() {
@@ -161281,6 +161353,9 @@ var FlowClient = class {
   }
   /** Pick a concrete model (duration and resolution are baked into Flow's model keys). */
   async resolveVideoModel(opts) {
+    if (!opts.modelKey && /veo.*lite/i.test(opts.family ?? "") && opts.mode === "references" && opts.durationSec && opts.durationSec !== 8) {
+      throw new FlowError(`Veo 3.1 - Lite con referencias no soporta ${opts.durationSec}s (r2v lite es solo 8s). Us\xE1 duration_sec=8 o family="omni".`);
+    }
     const models = (await this.models()).filter((m) => !/low_priority|relaxed|ultra/.test(m.key));
     if (opts.modelKey) {
       const m = (await this.models()).find((x) => x.key === opts.modelKey);
@@ -161403,7 +161478,7 @@ var FlowClient = class {
       await ui.openProject(o.projectId);
       await ui.setMode("manual");
       await ui.clearPrompt();
-      await ui.configure({ kind: "image", aspect: o.aspect, count: o.count });
+      await ui.configure({ kind: "image", aspect: o.aspect, count: o.count, model: o.model });
       for (const i of ingredients)
         await ui.addIngredient(i.name, i.kind);
       await ui.typePrompt(o.prompt);
@@ -161600,8 +161675,65 @@ var FlowClient = class {
         return { dryRun: true, quotedCredits: quote5, ingredients };
       }
       const res = await ui.submitGeneration();
-      if (res.error)
-        throw new FlowError(describeError(res.error));
+      if (res.error) {
+        const desc = describeError(res.error);
+        const esFrenoContenido = /PUBLIC_ERROR_(MINOR|MINORS|PERSON_GENERATION|PROMINENT_PEOPLE_FILTER_FAILED|UNSAFE_GENERATION)/.test(desc);
+        if (!o.retryWithAgent || !esFrenoContenido)
+          throw new FlowError(desc);
+        const cap = Math.min(o.maxCredits, 15);
+        const conocidos = new Set((await this.contents(o.projectId).catch(() => ({ media: [] }))).media.map((x) => x.mediaId));
+        try {
+          await ui.startNewAgentSession();
+          await ui.setMode("agent");
+          await ui.clearPrompt();
+          for (const i of ingredients)
+            await ui.addIngredient(i.name, i.kind);
+          const dur = o.model.durationSec ?? 4;
+          const resLabel = o.model.resolution ?? "720p";
+          const msg = `Generate ONE video (not an image) from the attached reference(s): ${dur} seconds, vertical ${o.aspect}, Omni ${resLabel}. Use exactly this prompt and nothing else: ${o.prompt}`;
+          await ui.typePrompt(msg);
+          let generatedIds = [];
+          try {
+            const firstTurn = parseAgentChunks(await ui.submitAgentTurn());
+            generatedIds.push(...firstTurn.generatedMediaIds);
+            const ask = firstTurn.permissionRequest;
+            if (ask) {
+              if ((ask.totalCost ?? Infinity) <= cap) {
+                const secondTurn = parseAgentChunks(await ui.answerPermission("Approve"));
+                generatedIds.push(...secondTurn.generatedMediaIds);
+              } else {
+                await ui.answerPermission("Reject").catch(() => {
+                });
+                throw new FlowError(`El agente pidi\xF3 ${ask.totalCost} cr\xE9ditos, m\xE1s que el tope de ${cap} (retomando modo manual).`);
+              }
+            }
+          } catch (agentErr) {
+            if (agentErr instanceof FlowError)
+              throw agentErr;
+            await ui.answerPermission("Approve").catch(() => {
+            });
+          }
+          if (!generatedIds.length) {
+            for (let k = 0; k < 24; k++) {
+              await sleep(5e3);
+              const cur = await this.contents(o.projectId).catch(() => ({ media: [] }));
+              const nueva = cur.media.find((x) => !conocidos.has(x.mediaId) && x.kind === "video");
+              if (nueva) {
+                generatedIds.push(nueva.mediaId);
+                break;
+              }
+            }
+          }
+          if (!generatedIds.length)
+            throw new FlowError(`${desc} \xB7 Tambi\xE9n fall\xF3 el reintento por agente (sin video generado).`);
+          const wfs = await this.workflowIdsFor(o.projectId, generatedIds).catch(() => []);
+          const jobs = generatedIds.map((mediaId, idx) => ({ mediaId, workflowId: wfs[idx] }));
+          return { quotedCredits: quote5, via: "agent", jobs };
+        } finally {
+          await ui.setMode("manual").catch(() => {
+          });
+        }
+      }
       return { quotedCredits: quote5, rpc: res.rpcId, ...parseVideoJobs(res.data) };
     });
   }

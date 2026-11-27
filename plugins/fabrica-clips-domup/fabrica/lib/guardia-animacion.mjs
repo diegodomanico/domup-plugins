@@ -56,7 +56,10 @@ export function guardiaAnimacion(dir) {
       const g = gs.find((x) => x.id === pedido.guion_elegido) || gs[0];
       const k = (t) => norm(String(t || '')).replace(/[^a-z0-9ñ ]/g, '').replace(/\s+/g, ' ').trim();
       const e1 = (esc[0]?.frases || []).map((f) => k(f.texto)).join(' ');
-      if (g?.hook && !e1.includes(k(g.hook))) malos.push(`escena 1: no dice el gancho del guion aprobado «${g.hook}» (el vendedor eligió ese guion por su gancho)`);
+      // 05-Nov (rack de VentiMaku): el hook viene «Matías: Amor, ¿esos bidones…» con el que habla adelante, y la frase no lleva el
+      // nombre: nunca coincidía y el plan se rechazó tres veces diciendo el gancho textual. Se compara sin el «Nombre:» inicial.
+      const hookSin = String(g?.hook || '').replace(/^\s*[\p{L} .]{1,30}:\s*/u, '');
+      if (g?.hook && !e1.includes(k(hookSin))) malos.push(`escena 1: no dice el gancho del guion aprobado «${g.hook}» (el vendedor eligió ese guion por su gancho)`);
     } catch { /* sin guiones.json no se controla */ }
   }
   const todas = [];
@@ -104,6 +107,12 @@ export function guardiaAnimacion(dir) {
       const L = (xs) => xs.reduce((k, f) => k + (f.texto || '').replace(/[^\p{L}\d]/gu, '').length, 0);
       const est = L(camara) / 8 + L(off) / 11 + 0.5, usable = (e.duracion || 4) - 0.7;
       if (est > usable) malos.push(`escena ${n}: frase a cámara + frase en off ≈ ${est.toFixed(1)} s de voz para ${usable.toFixed(1)} s de video usable; acortar o sacar la off, o pedir duracion 8`);
+      // Off ANTES de la frase a cámara (05-Nov, escáner de VentiMaku: «¿Y la batería, también la revisa?» en off y después Valentina
+      // a cámara). Flow no respeta «at about 2 seconds»: la hace hablar desde el 0,04 s, y el montaje solo puede sostener el primer
+      // cuadro 1,8 s mientras suena la off. Una off de más de ~1,8 s antes de la de cámara frena el clip ya animado, siempre.
+      const iOff = fr.findIndex((f) => f.modo === 'off'), iCam = fr.findIndex((f) => f.modo === 'camara');
+      if (iOff > -1 && iOff < iCam && L([fr[iOff]]) / 11 > 1.8)
+        malos.push(`escena ${n}: la frase en off «${fr[iOff].texto}» va antes de la de cámara y dura ≈ ${(L([fr[iOff]]) / 11).toFixed(1)} s; Flow hace hablar a quien está a cámara desde el primer segundo. Pasá la off al final de la escena anterior, ponela después de la de cámara o acortala a menos de 20 letras`);
     }
     fr.forEach((f) => {
       const p = elenco[f.personaje];
@@ -129,7 +138,14 @@ export function guardiaAnimacion(dir) {
   // El cierre de la marca va aparte y se dice sobre la placa final (ICAS 20-Oct; ep16c/d a REEL + 0,25).
   const cv = a.cierre_voz;
   const limpio = (t) => String(t || '').replace(/[.!¡¿?]/g, '').trim();
-  if (esencia.cierre && (!cv || limpio(cv.texto) !== limpio(esencia.cierre))) malos.push(`falta cierre_voz con el cierre de la marca textual: «${esencia.cierre}»`);
+  // 05-Nov (Racer Bikes): la esencia trae a veces una INSTRUCCIÓN y no una frase («Cierra con el nombre de la tienda RACER BIKES y
+  // el logo, sin frases institucionales»): pedirla textual hacía que el cierre leyera la instrucción en voz alta o que el plan no
+  // pasara nunca. Si es una instrucción, alcanza con que el cierre diga el nombre de la marca.
+  const esInstruccion = /^\s*(cierra|cerrar|termina|terminar|que cierre|usar|usá|decir|decí)\b|\bsin frases\b/i.test(esencia.cierre || '');
+  const marcaN = limpio(esencia.nombre_marca || '').toLowerCase();
+  if (esInstruccion) {
+    if (!cv || (marcaN && !limpio(cv.texto).toLowerCase().includes(marcaN))) malos.push(`falta cierre_voz que diga el nombre de la marca («${esencia.nombre_marca}»), como pide la esencia: «${esencia.cierre}»`);
+  } else if (esencia.cierre && (!cv || limpio(cv.texto) !== limpio(esencia.cierre))) malos.push(`falta cierre_voz con el cierre de la marca textual: «${esencia.cierre}»`);
   if (cv && !elenco[cv.personaje]?.voz_id && !['mujer_2', 'hombre_2', 'mujer_mayor', 'hombre_mayor'].includes(cv.personaje)) malos.push(`cierre_voz: «${cv.personaje}» no tiene voz de ElevenLabs`);
   if (cv && pedido.cierre_audio?.texto && limpio(cv.texto) !== limpio(pedido.cierre_audio.texto)) malos.push(`cierre_voz: tiene que ser textual la toma verificada «${pedido.cierre_audio.texto}»`);
   // Voseo (07-Oct): imperativo con pronombre pegado sin tilde en lo que va a la voz → ElevenLabs lo lee en tuteo.

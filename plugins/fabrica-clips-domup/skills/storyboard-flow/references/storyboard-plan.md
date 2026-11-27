@@ -56,6 +56,12 @@ ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/assets/historial-rechazos.md (las fallas
      ángulo que ninguna placa muestre ni la cámara del otro lado. Los cuadros seguidos del mismo set usan la misma placa salvo
      que la historia cambie de rincón, y los objetos que quedan (el producto instalado, una caja sobre la mesa) siguen en su
      lugar en todos los cuadros con esa placa.
+   - NUNCA DOS CUADROS SEGUIDOS CON EL MISMO TAMAÑO DE PLANO (05-Nov, rack de VentiMaku: c4 y c5 con la misma cámara frenaron
+     el storyboard dos veces, US$ 18). Entre dos cuadros seguidos de la misma placa cambia el plano: general → medio → cercano,
+     o un recorte más cerca y más bajo de la misma placa. En plan.json cada cuadro declara "plano": "general|medio|cercano|detalle"
+     y dos seguidos de la misma placa no repiten valor. El prompt lo dice con todas las letras: «CLOSER SHOT than the previous
+     frame: the camera has stepped forward about half the distance». Al acercarse, lo que queda fuera de cuadro (un gato, una
+     persona) se declara fuera, y se saca de "personajes" de ese cuadro.
    - CUARTO QUE FALTA (29-Oct, Maku: el guion pasaba en un pasillo y un dormitorio y la casa solo tenía living): si el guion
      necesita otro cuarto de la casa de la marca que todavía no tiene set (un dormitorio, un pasillo, un baño), ese cuadro va con
      "set": "<id de la casa>:<cuarto>" (ej. "casa-maku:dormitorio") y su prompt lleva TEXTUAL el "estilo" de esa casa más la
@@ -103,7 +109,7 @@ ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/assets/historial-rechazos.md (las fallas
     "personajes": {"<slot>": {"nombre": "<Nombre>", "ref": "<frase que lo ata a su retrato, ej. the girl from the Mili portrait>",
                               "rasgos": "<la SEMILLA del elenco del pedido, TEXTUAL; no se reescribe ni se resume>",
                               "vestuario": "<en inglés, la ropa COMPLETA: arriba, abajo y calzado. Si el pedido trae vestuario[slot], ESE texto TEXTUAL>"}},
-    "lienzo": "<SOLO si no usás sets con placas; con sets_usados va null (31-Oct). Prompt del lienzo con una celda por cuadro del plan (4x2 si son 8; 3x2 en los pedidos viejos de 6), con producto_lock, casa_lock y las frases de escala>",
+    "lienzo": "<SOLO si no usás sets con placas; con sets_usados va null (31-Oct). Prompt del lienzo con una celda por cuadro del plan (3x2 si son 6; 4x2 en los pedidos viejos de 8), con producto_lock, casa_lock y las frases de escala>",
     "cuadros": [{"n": 1, "prompt": "<prompt en inglés>", "muestra_producto": true|false, "abierto": true|false,
                  "logo": "locacion|ropa|ambos|null", "personajes": ["<slot>"], "cara_tapada": ["<slot que tiene el producto puesto sobre la cara, ej. una máscara; si no, []>"], "sostiene": "<slot o null>", "persona_escala": "<adulta|adulto|nena7|nene7|null>"}]}
    Reglas que la guardia controla (si no las cumplís, el plan vuelve):

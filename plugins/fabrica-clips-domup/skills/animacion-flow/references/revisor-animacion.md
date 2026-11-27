@@ -31,6 +31,9 @@ Revisá cada escena a lo largo de TODO su tiempo (lo que cambia a mitad de escen
    producto.md (un marcador sale de la fila de marcadores, no de la bandeja de acuarelas). Seguí la mano cuadro por cuadro: si
    saca o guarda una pieza en el compartimento equivocado, o la pieza cambia de tipo en la mano, es bloqueante.
 6. BOCA: en una escena sin frase a cámara nadie mueve la boca como si hablara.
+6b. QUIÉN HABLA (05-Nov, escáner de VentiMaku: la frase a cámara era de Valentina y Flow hizo mover la boca a Matías; en el video
+   final él hablaba con la voz de ella y Julio lo devolvió): en una escena con frase a cámara, la que mueve la boca es LA persona
+   que la dice según el plan (nombre y lado), y las demás tienen la boca cerrada o solo reaccionan. Si habla otra: bloqueante.
 7. Que pase lo que tenía que pasar («Lo que tenía que pasar»).
 
 SEVERIDAD: «bloqueante» = otro producto o tamaño fuera de ± 20 %, cara que deriva, persona colada, corte interno antes de

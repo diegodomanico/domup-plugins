@@ -62,6 +62,8 @@ LAS REGLAS DE DIEGO (22-Oct-2026), que la guardia controla:
 - Hasta 10 palabras por frase. La voz no dura más que la escena: hasta 10 letras por segundo de
   video (una escena de 4 s, hasta 40 letras sumando sus frases; si hace falta más, "duracion": 6 u 8). Voseo y la variante del país de la esencia. Tildes y signos completos.
 - Nada de precios, promos, envío, cuotas, garantías, links, redes ni «seguinos», ni nada de esencia.nunca_decir.
+- Si esencia.cierre es una INSTRUCCIÓN y no una frase («Cierra con el nombre de la tienda RACER BIKES…»), cierre_voz.texto es
+  lo que pide (el nombre de la marca, «RACER BIKES.»), nunca la instrucción leída en voz alta (05-Nov).
 - El cierre de la marca (esencia.cierre, TEXTUAL) NO va en las escenas: va aparte, en "cierre_voz", y se dice sobre la placa
   final (ICAS, 20-Oct). Lo dice el personaje principal con voz. La escena 6 lleva su propia frase.
 - VOSEO EN LA VOZ (07-Oct): si una frase tiene un imperativo de voseo con pronombre pegado (encontralo, sumalo, mirala,
@@ -111,7 +113,7 @@ ESCRIBÍ anim-plan.json con este formato EXACTO:
 - CARÁTULA (Diego, 18-Oct y 23-Oct-2026: «la primera imagen tenía que ser como preparada, con el producto, el logo y la
   pregunta»): es el primer cuadro del video y la miniatura. Se arma sola con el cuadro elegido (uno donde se ve el producto y los
   personajes en el momento del problema o del festejo), la foto real del producto en una tarjeta y el logo de la tienda. La
-  pregunta le habla al que mira, en voseo, sobre el problema que el producto resuelve (ej. «¿TE TRAGÁS|LA PILETA?»); hasta 14
+  pregunta le habla al que mira, en la variante de idioma de la esencia (pedido.esencia.variante_idioma; 14-Nov: una marca de tuteo salió con la carátula en voseo), sobre el problema que el producto resuelve (voseo «¿TE TRAGÁS|LA PILETA?»; tuteo o neutro «¿TE TRAGAS|LA ALBERCA?», sin «vos», «tenés», «mirá» ni «querés»); hasta 14
   letras por renglón; empieza con ¿ y termina con ?.
 - chips: uno por escena como máximo (hasta 7); el de la escena 1 es SIEMPRE «big»: es la capa de texto del gancho (3 a 7 palabras que
   afilan la primera frase sin repetirla; si el guion trae "gancho.texto", va ese), de hasta 14 letras por renglón, desde el 0,1 s.
@@ -130,7 +132,9 @@ ESCRIBÍ anim-plan.json con este formato EXACTO:
   · brillo {txt}: un nivel que sube (luz, carga, orden).  · bateria {txt}: una carga que se llena (energía, protección).
   · flecha {txt}: un rótulo con una flecha que apunta al producto o a la parte que importa (hasta 18 caracteres: «32 A IMPRESO»).
   · palabra {txt}: una palabra golpe en el centro, gigante, con temblor (hasta 12 letras: «¡ZAS!», «CERO CHISPAS»). Para el giro.
-  · barra {txt, pct}: una barra que se llena hasta pct (10 a 100): «PROTECCIÓN» 100.
+  · barra {txt, pct}: una barra que se llena hasta pct (10 a 100): «IMPERMEABLE» 100. Con 100 la barra se llena y NO muestra el
+    número (un «100 %» en pantalla es una promesa que la ficha no respalda: el revisor final lo frena). El número solo sale con
+    un dato real de la ficha menor a 100 («BATERÍA» 80). El texto nombra lo que la ficha dice, sin superlativos («PROTECCIÓN TOTAL» no).
   · versus {antes, despues}: lo de antes tachado y lo nuevo encima (hasta 18 caracteres cada uno: «TÉRMICA SUELTA» / «COMBO COMPLETO»).
   · reloj {txt}: un reloj que da vueltas (algo que se hace en un rato).  · marcador {txt, nota}: placa de TV con una nota («PRUEBA», «10»).
   · ondas: ondas que salen del producto (sonido, señal, corriente).  · sacudida: líneas de movimiento cuando algo se agita o se prueba.

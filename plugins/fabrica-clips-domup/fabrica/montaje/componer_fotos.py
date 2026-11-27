@@ -25,7 +25,8 @@ DIR, LOGO, COLOR, MARCA = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 KIT = json.load(open(sys.argv[5], encoding='utf-8')) if len(sys.argv) > 5 and os.path.exists(sys.argv[5]) else None
 ICONOS = sys.argv[6] if len(sys.argv) > 6 else None
 W, H = 1125, 2000            # 9:16 vertical, 2000 px de alto (todas, también la portada)
-SEGOE_B, SEGOE_R = 'C:/Windows/Fonts/segoeuib.ttf', 'C:/Windows/Fonts/segoeui.ttf'
+SEGOE_B = next((f for f in ('C:/Windows/Fonts/segoeuib.ttf', '/System/Library/Fonts/Supplemental/Arial Bold.ttf', '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf') if os.path.exists(f)), 'DejaVuSans-Bold.ttf')
+SEGOE_R = next((f for f in ('C:/Windows/Fonts/segoeui.ttf', '/System/Library/Fonts/Supplemental/Arial.ttf', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf') if os.path.exists(f)), 'DejaVuSans.ttf')
 
 def hexrgb(h): return tuple(int(h.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
 rgb = hexrgb(KIT['colores']['marca']) if KIT else hexrgb(COLOR)

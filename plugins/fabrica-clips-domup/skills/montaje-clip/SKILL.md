@@ -27,27 +27,29 @@ El montaje es `${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py`, el mismo que co
 | `voz/manifest.json` y las tomas | `voces-elevenlabs` |
 | identidad de la marca (`MARCA_JSON`) | `node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/marca-auto.mjs --pedido <clip>/pedido.json --kit <clip>/kit-montaje.json --out <clip>` (usa `logo_url` y `musica_url_firmada` de `clip_kit_montaje` sin gastar ElevenLabs extra; si falta `musica_url_firmada`, genera música con `ELEVENLABS_API_KEY`) |
 
-## Correr
+## Correr (ubicador de producto + montar.py + controles puros)
 
-- En Windows: `python ${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py <carpeta del clip>`
-- En Mac: `~/Documents/Fabrica\ DomUP/.venv/bin/python ${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py <carpeta del clip>` (o `python3` si tiene `cv2`, `PIL`, `numpy`)
-con las variables de `.env.local` cargadas y `MARCA_JSON` apuntando al `marca.json` que imprimió `marca-auto.mjs`. Sale `entrega/<item>-<pedido>.mp4` y `montaje/linea.json`.
+1. **Ubicar producto antes de montar** (evita que rótulos o subtítulos tapen el producto, usando `${CLAUDE_PLUGIN_ROOT}/fabrica/lib/ubicar-producto-puro.mjs`):
+   - Corré `node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/ubicar-producto-puro.mjs cuadros <carpeta del clip>` → extrae `montaje-cajas/eN.jpg` (720×1280).
+   - Mirá cada cuadro con `Read` (o en subagente localizador) y guardá `{ "1": [x0, y0, x1, y1], ... }` en `cajas-tmp.json`, luego corré `node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/ubicar-producto-puro.mjs guardar <carpeta del clip> cajas-tmp.json`.
+2. **Correr `montar.py`** (HyperFrames se resuelve directo sin `shell=True`, sin generar `.ps1`):
+   - En Windows: `python ${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py <carpeta del clip>`
+   - En Mac: `~/Documents/Fabrica\ DomUP/.venv/bin/python ${CLAUDE_PLUGIN_ROOT}/fabrica/montaje/montar.py <carpeta del clip>` (o `python3` si tiene `cv2`, `PIL`, `numpy`)
+   con las variables de `.env.local` cargadas y `MARCA_JSON` apuntando al `marca.json` que imprimió `marca-auto.mjs`. Sale `entrega/<item>-<pedido>.mp4` y `montaje/linea.json`.
+3. **Control puro obligatorio antes de `clip_revisar(paso="final")`**:
+   - Corré `node ${CLAUDE_PLUGIN_ROOT}/fabrica/lib/controles-puros.mjs clip <carpeta del clip>` (`controlarClip` puro: verifica receta de voces, huecos ≤ 0,8 s, transcripción del audio final contra el guion, -14 ± 0,5 LUFS, duración 12–18 s en 6 escenas, D008 subtítulo vs voz y nombre de marca dicho). Si sale con código 1, corregí y re-montá antes de pasar a `clip_revisar`.
 
-Lo que el script garantiza (y hay que comprobar al final): carátula 0,6 s; todo a 1,13x; aire de 0,3 s entre frases; la voz de Flow nunca entra; subtítulos con su parte de arriba en y=740 (660 si tapa una cara) y nada debajo de 880; logo en la escena 3-4; efectos HyperFrames del kit; música de la marca con sidechain; cierre animado de 3 a 4,1 s; mezcla a -14 LUFS con true peak de -1,5. Si frena con «quedaría X s congelado», se acorta la frase o se anima esa escena a 6 u 8 s, como dice el mensaje.
+Lo que el script garantiza (y controla): carátula 0,6 s; todo a 1,13x; aire de 0,3 s entre frases; la voz de Flow nunca entra; subtítulos con su parte de arriba en y=740 (660 si tapa una cara ni pisa producto/logo) y nada debajo de 880; logo en la escena 3-4; efectos HyperFrames del kit; música de la marca con sidechain; cierre animado de 3 a 4,1 s; mezcla a -14 LUFS con true peak de -1,5. Si frena con «quedaría X s congelado», se acorta la frase o se anima esa escena a 6 u 8 s, como dice el mensaje.
 
-**Sin sesión local**: el mismo script corre en la ejecución de código de Claude (con los archivos ya subidos en la sesión) y se entrega el MP4 en el chat, pidiéndole al vendedor que lo descargue desde `claude.ai` en una pestaña o desde la app de escritorio (no desde el panel lateral de Chrome, donde las tarjetas de archivo no descargan). Si en ejecución de código falla o falta HyperFrames, no se improvisa ni se piden zips o comandos: indicá pasar a Claude Code o app de escritorio con su carpeta.
+**Sin sesión local**: el mismo script corre en la ejecución de código de Claude (con los archivos ya subidos en la sesión) y se entrega el MP4 en el chat, pidiéndole al vendedor que lo descargue desde `claude.ai` en una pestaña o desde la app de escritorio (no desde el panel lateral de Chrome, donde las tarjetas de archivo no descargan). Si en ejecución de código falla o falta HyperFrames, no se improvisa ni se piden zips o comandos: indicá pasar a Claude Code o app de escritorio con su carpeta. Nunca generes scripts `.ps1`.
 
 ## Chequeo local de audio obligatorio + Puerta (`clip_revisar` final obligatorio)
 
-**Nunca entregues el MP4 sin pasar por `clip_revisar(paso="final")` y obtener `APTO`.**
+**Nunca entregues el MP4 sin pasar `controles-puros.mjs clip` y `clip_revisar(paso="final")` con `APTO`.**
 
-1. **Verificación local obligatoria de audio y música** antes de llamar a `clip_revisar(paso="final")`:
-   - Verificá con `ffprobe` que exista pista de audio y que su duración coincida con la del video (diferencia ≤ 0,5 s, sin audio cortado):
-     `ffprobe -v error -show_entries format=duration -show_entries stream=codec_type,codec_name,duration -of json <entrega.mp4>`
-   - Medí sonoridad y confirmá que la música entró en la mezcla (especialmente en el cierre, sin silencio largo > 1,5 s):
-     `ffmpeg -i <entrega.mp4> -af ebur128,silencedetect=noise=-45dB:d=1.5 -f null -`
-   - Si falta audio, está cortado, o no entró música, corregí y re-montá antes de revisar.
-2. **Cuadros para el revisor**: achicá a 1080 px de lado largo con ffmpeg (carátula + 1 fotograma por escena + cierre), pedí `clip_revisar_subir(cantidad=N, clip_ref?, item_id?, paso="final")`, subí cada uno con el `curl --fail-with-body` que devuelve y pasá los path a `clip_revisar`. Sin terminal (`claude.ai` en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues las URL firmadas en el chat.
+1. `controles-puros.mjs clip <carpeta>` + chequeo `ffprobe` / `ffmpeg ebur128`:
+   - Confirmar pista de audio completa (diferencia ≤ 0,5 s respecto al video), música en mezcla (sin silencio largo > 1,5 s) y `-14 ± 0,5 LUFS`.
+2. **Cuadros para el revisor**: achicá a 1080 px de lado largo con ffmpeg (carátula + 1 fotograma por escena + cierre), subí con `clip_revisar_subir(cantidad=N, clip_ref?, item_id?, paso="final")` (`curl --fail-with-body`) o pasá URL pública `https` / base64 a `clip_revisar`. Sin terminal (`claude.ai` en el navegador): pedile al vendedor que arrastre los archivos al chat. Nunca pegues URL firmadas en el chat.
 3. Llamá `clip_revisar(item_id, paso="final", imagenes=[carátula + 1 fotograma por escena + cierre], notas="audio_ok=<true|false>; dur_video=<s>; dur_audio=<s>; lufs=<I>; musica_en_mezcla=<true|false>; silencios_largos=<N>; logo_px=<WxH>", clip_ref=...)`. El revisor final rechaza como **bloqueante**: audio cortado, falta de música, logo pixelado o falta de animaciones HyperFrames. Con NO APTO se corrige y se revisa una vez más.
 
-Al terminar el montaje (o si falla), registrá con `clip_registrar_paso(cust_id?, clip_ref, paso="montaje", estado="ok"|"error", item_id, detalle={ duracion_s, lufs, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json`, y con `paso="entregado"` al entregar el MP4 final aprobado. Si falla el registro, avisá y seguí, nunca frenes el clip por eso.
+**Regla obligatoria de trazabilidad**: al terminar el montaje (o si falla/hay aviso), llamá a `clip_registrar_paso(cust_id?, clip_ref, paso="montaje", estado="ok"|"error"|"aviso", item_id, detalle={ duracion_s, lufs, archivo_final, plugin_version, motivo? })` usando el `clip_ref` de `clip-<item>/config.json`, y al entregar el MP4 final aprobado llamá a `clip_registrar_paso(cust_id?, clip_ref, paso="entregado", estado="ok", item_id, detalle={ duracion_s, lufs, archivo_final, creditos_flow, caracteres_elevenlabs, plugin_version })`. **Importante**: `archivo_final` debe ser SOLO el nombre de archivo o una ruta relativa a la carpeta del clip (ej. `"entrega/<item>-<pedido>.mp4"`), NUNCA una ruta absoluta (`C:\Users\...`, `/Users/...`, `/home/...`), porque el servidor la rechaza. Si falla el registro, avisá y seguí, nunca frenes el clip por eso.

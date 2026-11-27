@@ -40,7 +40,10 @@ python ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/prevuelo.py --lint "<prom
    que ocupa el producto y POR QUÉ, atado a un dato: una duda de voz-comprador.md, un atributo de la ficha o un elogio de las
    reseñas). Versión 2 (Diego, 31-Oct-2026, sobre la primera prueba: «se repiten, están muy forzadas… el producto tiene que ser
    más grande… el producto, siempre»). Cinco reglas que mandan sobre todo lo de abajo:
-   R1 PRODUCTO PROTAGONISTA. En la portada el producto mide el 70 % del alto del cuadro. En las de RAZÓN es lo más grande de la foto:
+   R1 (productos finos o alargados: estaca, varilla, tira, cable): se mide el LARGO, no el área: 45 % del alto o del ancho del cuadro
+      en las de RAZÓN y 30 % en las de EMOCIÓN, siempre en primer plano. Todas las bases se piden en alta (9:16, 1125x2000 o más):
+      una base de menos de 700 px de ancho se regenera antes de componer.
+   R1 PRODUCTO PROTAGONISTA. En la portada el producto mide el 70 % del alto del cuadro (si es ancho y bajo y no puede: el 85 % del ancho). En las de RAZÓN es lo más grande de la foto:
       ocupa el 40 % del cuadro o más (en el detalle, casi todo); la persona acompaña. En las de EMOCIÓN la persona disfrutando puede
       ser lo más grande, pero el producto está entero, nítido, en uso y ocupa el 20 % o más. Escribí el % de cada pieza en carrusel.md.
    R2 ELENCO CON MEDIDA. Personas en 6 de las 12 como máximo (manos sueltas no cuentan); cada integrante en 3 como máximo; nunca
@@ -67,6 +70,13 @@ python ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/prevuelo.py --lint "<prom
       de la marca RECONOCIBLE al costado: la cara entera, mirando a cámara, sosteniendo o junto al producto sin taparlo (Diego,
       31-Oct: «la 1 tiene que tener el avatar reconocible para proteger la imagen de que la copien otros vendedores»: es el sello
       de la marca). Nunca la cara cortada por el borde. Sin texto ni logo. También la 01b sin persona, de reserva.
+      CÓMO SE ARMA LA 01 (09-Nov-2026: 12 carruseles de VEO.QUIERO frenados porque la 01 salía con Vero sosteniendo el producto en
+      la mano, chico, al 18-30 % del alto; o grande en la mano y entonces fuera de escala). El producto va APOYADO EN PRIMER PLANO,
+      cerca de cámara (sobre una superficie blanca o un pedestal), entero, llenando el 70 % del alto o el 85 % del ancho; el avatar
+      va DETRÁS del producto, más lejos de cámara, con la cara entera y reconocible, asomado o inclinado hacia él, señalándolo o
+      con las manos a los costados. NO lo sostiene en la mano, salvo que el producto mida más de 60 cm. Pedilo así en el prompt:
+      «product in the close foreground on a white surface, filling most of the frame; the person behind it, further from the
+      camera, whole face visible». Medí en la imagen que salió: si el producto no llega, regenerá ANTES de seguir con las demás.
       NO LAS INVIERTAS (04-Nov-2026: en VEO.QUIERO salió la 01 con la valija sola y la 01b con Vero, y el revisor frenó el carrusel
       entero después de gastar USD 14): 01 = CON el avatar; 01b = SOLO el producto. Antes de escribir carrusel.json, abrí las dos y
       confirmalo; si quedaron al revés, renombralas.
@@ -142,4 +152,7 @@ python ${CLAUDE_PLUGIN_ROOT}/vendor/shorts-mtl/scripts/prevuelo.py --lint "<prom
    - carrusel/01.jpg, carrusel/01b.jpg, carrusel/02.jpg … carrusel/12.jpg (finales, con texto).
    - carrusel.jpg: hoja de contacto con las 13 en grilla y su número debajo.
    - carrusel.json y carrusel.md (lo que se reusó y lo que se regeneró).
+   SI FLOW CONTESTA «PUBLIC_ERROR_UNUSUAL_ACTIVITY» (su chequeo anti-robot): no esperes ni reintentes, no pruebes otro modelo ni
+   otro camino. Cortá en el momento y respondé «ERROR: PUBLIC_ERROR_UNUSUAL_ACTIVITY». El programa pausa Flow y retoma solo;
+   lo que ya generaste queda en la carpeta y se reusa.
    Terminá respondiendo una sola línea: «OK fotos» o «ERROR: <motivo>».

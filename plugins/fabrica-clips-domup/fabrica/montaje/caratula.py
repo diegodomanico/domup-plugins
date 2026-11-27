@@ -35,15 +35,39 @@ def main(panel, foto, titulo, nombre, salida, recorte=None):
     lineas = titulo.split('|')
     ft = ImageFont.truetype(F_TIT, 64)
     alto = 40 + len(lineas) * 78 + 20
-    sombra = Image.new('RGBA', (W, H)); ImageDraw.Draw(sombra).rounded_rectangle((34, 74, W - 26, 74 + alto), 28, fill=(0, 0, 0, 110))
+    # 05-Nov (rack de VentiMaku): la franja iba siempre arriba (y=66) y en el cuadro elegido tapaba la frente y los ojos de Matías.
+    # Se miden las caras del cuadro (con pelo y mentón) y la franja va a la primera altura libre; si no hay, a la que menos tapa.
+    caras = []
+    try:
+        import cv2, numpy as np
+        M = os.environ.get('SHORTS_MTL', os.path.join(AQUI, '..', '..', 'vendor', 'shorts-mtl')) + '/assets/modelos-caras/face_detection_yunet_2023mar.onnx'
+        im = cv2.cvtColor(np.array(base), cv2.COLOR_RGB2BGR)
+        det = cv2.FaceDetectorYN.create(M, '', (W, H), 0.6); _, cs = det.detect(im)
+        for f in (cs if cs is not None else []):
+            x, yy, w, h = [float(v) for v in f[:4]]
+            if w >= 30: caras.append((x - 0.25 * w, yy - 0.45 * h, x + 1.25 * w, yy + 1.7 * h))
+    except Exception as e:
+        print('caras: no se pudieron medir', e)
+    tope_abajo = H - 330   # arriba de la tarjeta del producto y el logo
+    def tapa(y0):
+        return sum(max(0, min(W - 30, b) - max(30, a)) * max(0, min(y0 + alto, d2) - max(y0, c0)) for a, c0, b, d2 in caras)
+    paso = 78
+    y_band = 66 if tapa(66) == 0 else None
+    if y_band is None:
+        # Fuera de arriba, la franja va más baja: letra un poco más chica para dejar aire con el producto, que suele ir abajo.
+        ft = ImageFont.truetype(F_TIT, 54); paso = 66; alto = 40 + len(lineas) * paso + 14
+    alturas = [66] + list(range(120, max(121, tope_abajo - alto), 20))
+    if y_band is None: y_band = next((y0 for y0 in alturas if tapa(y0) == 0), None)
+    if y_band is None: y_band = min(alturas, key=tapa); print(f'carátula: no hay franja libre de caras; va donde menos tapa (y={y_band})')
+    sombra = Image.new('RGBA', (W, H)); ImageDraw.Draw(sombra).rounded_rectangle((34, y_band + 8, W - 26, y_band + 8 + alto), 28, fill=(0, 0, 0, 110))
     c = Image.alpha_composite(c, sombra.filter(ImageFilter.GaussianBlur(10))); d = ImageDraw.Draw(c)
-    d.rounded_rectangle((30, 66, W - 30, 66 + alto), 28, fill=ROJO)
-    y = 66 + 34
+    d.rounded_rectangle((30, y_band, W - 30, y_band + alto), 28, fill=ROJO)
+    y = y_band + 34
     for l in lineas:
         w = d.textlength(l, font=ft)
-        if w > W - 100: ft2 = ImageFont.truetype(F_TIT, int(64 * (W - 100) / w)); w = d.textlength(l, font=ft2)
+        if w > W - 100: ft2 = ImageFont.truetype(F_TIT, int(ft.size * (W - 100) / w)); w = d.textlength(l, font=ft2)
         else: ft2 = ft
-        d.text(((W - w) / 2, y), l, font=ft2, fill='white'); y += 78
+        d.text(((W - w) / 2, y), l, font=ft2, fill='white'); y += paso
     # producto real en tarjeta blanca (abajo a la izquierda)
     p = Image.open(foto).convert('RGB')
     if recorte: p = p.crop(recorte)
@@ -68,7 +92,14 @@ def main(panel, foto, titulo, nombre, salida, recorte=None):
     ls = min(140, lg.width) if lg.width > 0 else 140
     if ls != lg.width:
         lg = lg.resize((ls, max(1, int(lg.height * ls / lg.width))), Image.LANCZOS)
-    lg = tarjeta(lg, min(30, max(4, min(lg.width, lg.height) // 4)))
+    import os
+    if os.environ.get('LOGO_SIN_TARJETA') == '1':
+        # sin tarjeta (12-Nov, Veoquiero: «el logo no es así»): el logo recortado, con un contorno claro pegado a su forma
+        alfa = lg.split()[3]
+        halo = Image.new('RGBA', lg.size, (255, 255, 255, 0)); halo.putalpha(alfa.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(1.2)))
+        lg = Image.alpha_composite(halo, lg)
+    else:
+        lg = tarjeta(lg, min(30, max(4, min(lg.width, lg.height) // 4)))
     c.paste(lg, (W - lg.width - 30, H - lg.height - 30), lg)
     if contraste((255, 255, 255), ROJO) < 4.5: raise SystemExit(f'✗ el blanco sobre la franja {ROJO} no llega a 4,5:1: oscurecer el color en marcas/')
     c.convert('RGB').save(salida, quality=95)
